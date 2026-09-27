@@ -64,7 +64,7 @@ def decode_tx(dec: IdlDecoder, tx: dict, sig: str) -> list[dict]:
             try: data = base58.b58decode(ix["data"])
             except Exception: continue
             ev = dec.decode_event_cpi(data)
-            if ev: out.append(dict(slot=tx["slot"], block_time=tx.get("blockTime"), signature=sig, ix_index=f"{grp['index']}.{i}", name=ev["name"], data=ev.get("data"), disc=ev.get("disc")))
+            if ev: out.append(dict(slot=tx["slot"], block_time=tx.get("blockTime"), signature=sig, ix_index=f"{grp['index']}.{i}", name=ev["name"], data=ev.get("data"), disc=ev.get("disc"), signer=(keys[0] if keys else None)))
     return out
 
 

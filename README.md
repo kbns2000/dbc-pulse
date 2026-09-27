@@ -13,8 +13,8 @@ Real-time data stream and analytics for **Meteora Dynamic Bonding Curve (DBC)** 
 Program: `dbcij3LWUppWqq96dh6gJWwBifmcGfLSB5D4DuSMaqN` (mainnet & devnet). Built during Colosseum Crypto World's Fair 2026 for the Meteora DBC side track.
 
 ## Status
-- [ ] Event collector (RPC signatures → transactions → event-CPI decode)
-- [ ] Pool state tracker (curve progress, thresholds, pressure)
+- [x] Event collector (RPC signatures → transactions → event-CPI decode) — `python -m dbc_pulse.collector --follow`
+- [x] Pool state tracker (curve progress, thresholds, buy/sell pressure, per-config completion & instant-launch share) — `python -m dbc_pulse.pool_tracker`
 - [ ] DAMM v2 LP realized-yield tracker (fees − LVR)
 - [ ] Stream API (WebSocket/REST) + dashboard
 - [ ] Docs, tests, pitch
