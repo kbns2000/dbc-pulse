@@ -27,7 +27,12 @@ Budget: one WebSocket plus roughly 1–2 HTTP calls/s regardless of chain volume
 - [x] DAMM v2 migration mapping (`migration_damm_v2` accounts → DAMM pool) + LP realized-yield tracker per unit liquidity: fees − LVR (interval rebalancing benchmark), σ and σ²/8 theory comparison, reserve-identity self-check — `dbc_pulse/damm.py`, live in the stream (`data/migration_*.jsonl`, `data/damm_*.jsonl`, `data/damm_live.json`)
 - [x] Stream API (REST + WebSocket push) + light dashboard — `python -m dbc_pulse.api` → http://127.0.0.1:8790/ (routes: /health /pools /configs /damm /events /migrations; ws://127.0.0.1:8791/)
 - [x] Tests (`python -m pytest -q`: IDL round-trip, PoolState layout, LP math incl. LVR/fees/anomaly flags, migration decoding) + GitHub Actions CI
-- [ ] Pitch deck / videos
+- [x] Videos — demo: https://youtu.be/cBaDFNhWGKk · pitch: https://youtu.be/E2WX_iJQx0I (Colosseum Crypto World's Fair, Meteora DBC track)
+
+## Early measurements (mainnet, first day)
+- Program throughput swings between ~1.4 and ~24 tx/s minute to minute; in 1.4 h: 240 pools touched, 83 launched, 70 curves completed across 123 configs. Some configs graduate 100% of launches in one fill within a minute (bundled), others take a median of 137–406 swaps.
+- DAMM v2, first hour after migration (clean pools, n=7): measured LVR / (σ²/8) = 0.78–0.96; fees cover 1–3% of LVR. Pools with a >10× price move or a >50% liquidity pull inside one poll are flagged and excluded from aggregates.
+- Fee ladder from `PoolConfig`: protocol 20% of trading fee → remainder split between partner (config owner) and creator (`creator_trading_fee_percentage`); partner also receives locked/unlocked LP at migration, migration fee (0–10%) and surplus. Across 319 tracked young pools: 129.6 SOL lifetime trading fees, top 3 partner wallets 66.7%, median config 0.001 SOL.
 
 ## API and dashboard
 `python -m dbc_pulse.api` reads only the files the stream writes (no RPC) and serves:
