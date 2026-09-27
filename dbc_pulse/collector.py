@@ -36,6 +36,8 @@ class Rpc:
         for attempt in range(5):
             try:
                 r = self.s.post(self.url, json={"jsonrpc": "2.0", "id": 1, "method": method, "params": params}, timeout=40); self._last = time.time()
+                if r.status_code == 429 or "json" not in (r.headers.get("content-type") or ""):
+                    time.sleep(2.0 * (attempt + 1)); continue   # rate-limited or HTML error page: back off, never hammer
                 j = r.json()
                 if "error" in j:
                     if j["error"].get("code") == 429 or "rate" in str(j["error"]).lower(): time.sleep(1.5 * (attempt + 1)); continue
@@ -99,7 +101,17 @@ def backfill(rpc: Rpc, dec: IdlDecoder, n: int):
     return stats
 
 
-def follow(rpc: Rpc, dec: IdlDecoder, poll_s: float = 3.0):
+HB = DATA / "follow_heartbeat.json"
+
+
+def _another_follower_alive(max_age: float = 90.0) -> bool:
+    try: return time.time() - json.loads(HB.read_text(encoding="utf-8"))["ts"] < max_age
+    except Exception: return False
+
+
+def follow(rpc: Rpc, dec: IdlDecoder, poll_s: float = 5.0):
+    if _another_follower_alive():
+        print("another follow collector is alive (heartbeat < 90s) — exiting to keep a single instance", flush=True); return
     st = json.loads(STATE.read_text(encoding="utf-8")) if STATE.exists() else {}; until = st.get("last_signature")
     print(f"follow mode · until={until} · poll {poll_s}s", flush=True)
     while True:
@@ -112,11 +124,13 @@ def follow(rpc: Rpc, dec: IdlDecoder, poll_s: float = 3.0):
                 print(f"{time.strftime('%H:%M:%S')} +{len(batch)} sigs · {stats['events']} events · errored {stats['errored']}", flush=True)
         except Exception as e:
             print(f"error {type(e).__name__}: {e}", flush=True); time.sleep(5)
+        try: HB.write_text(json.dumps({"ts": time.time(), "pid": os.getpid(), "until": until}), encoding="utf-8")
+        except Exception: pass
         time.sleep(poll_s)
 
 
 def main():
-    load_env(); ap = argparse.ArgumentParser(); ap.add_argument("--backfill", type=int, default=0); ap.add_argument("--follow", action="store_true"); ap.add_argument("--rps", type=float, default=8.0); a = ap.parse_args()
+    load_env(); ap = argparse.ArgumentParser(); ap.add_argument("--backfill", type=int, default=0); ap.add_argument("--follow", action="store_true"); ap.add_argument("--rps", type=float, default=4.0); a = ap.parse_args()
     url = os.environ.get("SOLANA_RPC_URL")
     if not url: sys.exit("SOLANA_RPC_URL not set (.env)")
     rpc = Rpc(url, a.rps); dec = IdlDecoder(ROOT / "dbc_pulse" / "idl" / "dbc.json")
