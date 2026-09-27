@@ -154,7 +154,8 @@ class Stream:
                     if not st: continue
                     prev = self.uni.pools[k]; cfg = st["config"]
                     if cfg not in self.uni.configs: self.uni.configs[cfg] = None   # fetched below
-                    thr = (self.uni.configs.get(cfg) or {}).get("migration_quote_threshold")
+                    cfgd = self.uni.configs.get(cfg) or {}; thr = cfgd.get("migration_quote_threshold")
+                    if cfgd.get("quote_mint"): prev["quote_mint"] = cfgd["quote_mint"]
                     dq = st["quote_reserve"] - prev.get("quote_reserve", st["quote_reserve"])
                     prev.update(st); prev["progress_pct"] = round(100 * st["quote_reserve"] / thr, 3) if thr else None; prev["last_poll"] = t0
                     if dq: prev["last_activity"] = t0; prev["quote_delta_buy"] = prev.get("quote_delta_buy", 0) + max(dq, 0); prev["quote_delta_sell"] = prev.get("quote_delta_sell", 0) + max(-dq, 0)

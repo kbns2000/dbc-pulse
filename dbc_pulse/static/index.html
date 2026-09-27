@@ -46,13 +46,13 @@
   </section>
   <section>
     <h2>Curves closest to migration</h2>
-    <div class="hint">VirtualPool accounts read every 3s · progress = quote reserve / config migration threshold · buy/sell = reserve deltas since tracking (SOL units assume 9 dp quote)</div>
-    <table id="pools"><thead><tr><th>pool</th><th>progress</th><th>quote res</th><th>buy</th><th>sell</th><th>fee</th><th>config</th></tr></thead><tbody></tbody></table>
+    <div class="hint">VirtualPool accounts read every 3s · progress = quote reserve / config migration threshold · buy/sell = reserve deltas since tracking · amounts shown in whole quote tokens for SOL (9 dp); other quote mints are shown raw with their mint</div>
+    <table id="pools"><thead><tr><th>pool</th><th>progress</th><th>quote res</th><th>buy</th><th>sell</th><th>fee</th><th>quote</th><th>config</th></tr></thead><tbody></tbody></table>
   </section>
   <section>
     <h2>DAMM v2 LP realized yield (per unit of liquidity, since migration)</h2>
     <div class="hint">fees − LVR from on-chain state · LVR = hold-previous-composition vs stay-in-pool, summed over 10s polls · σ annualized (×) · theory = σ²/8 · <span class="flag">⚑</span> = price jump &gt;10× or liquidity pull inside one poll (excluded from aggregates)</div>
-    <table id="damm"><thead><tr><th>DAMM pool</th><th>h</th><th>price %</th><th>fees %</th><th>LVR %</th><th>net %</th><th>σ ×</th><th>σ²/8 %</th><th>chk</th><th></th></tr></thead><tbody></tbody></table>
+    <table id="damm"><thead><tr><th>DAMM pool</th><th>h tracked</th><th>h since migr.</th><th>price %</th><th>fees %</th><th>LVR %</th><th>net %</th><th>σ ×</th><th>σ²/8 %</th><th>chk</th><th></th></tr></thead><tbody></tbody></table>
   </section>
   <section class="wide">
     <h2>Launch configs (live)</h2>
@@ -68,7 +68,8 @@
 <script>
 const $ = s => document.querySelector(s);
 const short = (k, n = 6) => k ? k.slice(0, n) + '…' + k.slice(-4) : '';
-const sol = v => (typeof v === 'number') ? (v / 1e9).toFixed(3) : '-';
+const SOL = 'So11111111111111111111111111111111111111112';
+const sol = (v, mint) => (typeof v !== 'number') ? '-' : (!mint || mint === SOL) ? (v / 1e9).toFixed(3) : String(v);
 const pct = (v, d = 2) => (typeof v === 'number') ? v.toFixed(d) : '-';
 const cls = v => (typeof v === 'number') ? (v > 0 ? 'pos' : v < 0 ? 'neg' : '') : '';
 const num = (v, d = 2) => (typeof v === 'number') ? v.toFixed(d) : '-';
@@ -85,10 +86,10 @@ function renderHealth(h) {
 function renderPools(rows) {
   $('#pools tbody').innerHTML = rows.slice(0, 25).map(p => `<tr><td class="mono">${short(p.pool)}${p.is_curve_complete ? ' ✓' : ''}</td>
     <td><div class="bar"><i style="width:${Math.min(100, p.progress_pct)}%"></i><b>${pct(p.progress_pct, 1)}%</b></div></td>
-    <td>${sol(p.quote_reserve)}</td><td class="pos">${sol(p.buy_quote)}</td><td class="neg">${sol(p.sell_quote)}</td><td>${sol(p.trading_quote_fee)}</td><td class="mono">${short(p.config, 4)}</td></tr>`).join('');
+    <td>${sol(p.quote_reserve, p.quote_mint)}</td><td class="pos">${sol(p.buy_quote, p.quote_mint)}</td><td class="neg">${sol(p.sell_quote, p.quote_mint)}</td><td>${sol(p.trading_quote_fee, p.quote_mint)}</td><td class="mono">${(!p.quote_mint || p.quote_mint === SOL) ? 'SOL' : short(p.quote_mint, 4)}</td><td class="mono">${short(p.config, 4)}</td></tr>`).join('');
 }
 function renderDamm(rows) {
-  $('#damm tbody').innerHTML = rows.slice(0, 25).map(d => `<tr><td class="mono">${short(d.pool)}</td><td>${num(d.hours, 2)}</td>
+  $('#damm tbody').innerHTML = rows.slice(0, 25).map(d => `<tr><td class="mono">${short(d.pool)}</td><td>${num(d.hours, 2)}</td><td>${num(d.hours_since_migration, 2)}</td>
     <td class="${cls(d.price_change_pct)}">${pct(d.price_change_pct, 1)}</td><td class="pos">${pct(d.fees_pct, 3)}</td><td class="neg">${pct(d.lvr_pct, 3)}</td>
     <td class="${cls(d.net_pct)}">${pct(d.net_pct, 3)}</td><td>${num(d.sigma_ann, 1)}</td><td>${pct(d.theory_lvr_pct, 3)}</td><td>${num(d.reserve_check, 2)}</td>
     <td class="flag">${d.clean === false ? '⚑' : ''}</td></tr>`).join('');

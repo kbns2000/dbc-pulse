@@ -132,7 +132,7 @@ class LpTracker:
         if self.v0 is None or self.v0 <= 0: return {}
         hrs = ((self.last_t or self.t0) - self.t0) / 3600.0; yrs = hrs / (24 * 365.25)
         sigma_ann = math.sqrt(self.sum_r2 / yrs) if yrs > 0 and self.sum_r2 > 0 else None
-        return dict(hours=round(hrs, 3), price_change_pct=round(100 * (self.last_price / self.p0 - 1), 3) if self.p0 else None, fees_pct=round(100 * self.fees_q / self.v0, 4),
+        return dict(hours=round(hrs, 3), tracked_since=int(self.t0), migrated_at=self.meta.get("block_time"), hours_since_migration=round((((self.last_t or self.t0) - self.meta["block_time"]) / 3600.0), 3) if self.meta.get("block_time") else None, price_change_pct=round(100 * (self.last_price / self.p0 - 1), 3) if self.p0 else None, fees_pct=round(100 * self.fees_q / self.v0, 4),
                     lvr_pct=round(100 * self.lvr_q / self.v0, 4), net_pct=round(100 * (self.fees_q - self.lvr_q) / self.v0, 4), sigma_ann=round(sigma_ann, 3) if sigma_ann else None,
                     theory_lvr_pct=round(100 * (sigma_ann ** 2 / 8) * yrs, 4) if sigma_ann else None,   # CPMM full-range approximation σ²/8 per year × elapsed
                     fees_apr_pct=round(100 * self.fees_q / self.v0 / yrs, 2) if yrs > 0 else None, lvr_apr_pct=round(100 * self.lvr_q / self.v0 / yrs, 2) if yrs > 0 else None, polls=self.n,
