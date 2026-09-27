@@ -12,8 +12,16 @@ Real-time data stream and analytics for **Meteora Dynamic Bonding Curve (DBC)** 
 
 Program: `dbcij3LWUppWqq96dh6gJWwBifmcGfLSB5D4DuSMaqN` (mainnet & devnet). Built during Colosseum Crypto World's Fair 2026 for the Meteora DBC side track.
 
+## Architecture (v2)
+The program does ~25 tx/s in busy minutes, so per-transaction fetching is not viable on a small RPC plan (2M calls/day).
+dbc-pulse instead uses three cheap channels (`dbc_pulse/stream.py`):
+1. **logsSubscribe** on the program — every transaction is classified from its `Instruction:` logs; swaps are counted, lifecycle transactions (initialize, migration, withdraw, claims) are the only ones fetched and fully decoded via event-CPI.
+2. **Account polling** — tracked `VirtualPool` accounts are read with `getMultipleAccounts` (100 per call) every 3s and decoded from the IDL: reserves, sqrt price, fees, migration flags. Reserve deltas between polls give buy/sell pressure without per-swap fetches; `PoolConfig` (cached) gives the migration threshold.
+3. **Sampling** — 1 in N swap transactions is fetched for wallet-level stats.
+Budget: one WebSocket plus roughly 1–2 HTTP calls/s regardless of chain volume. A heartbeat file makes the stream single-instance.
+
 ## Status
-- [x] Event collector (RPC signatures → transactions → event-CPI decode) — `python -m dbc_pulse.collector --follow`
+- [x] Event collector (RPC signatures → transactions → event-CPI decode) — `python -m dbc_pulse.collector --backfill N` (batch) / v2 live stream `python -m dbc_pulse.stream`
 - [x] Pool state tracker (curve progress, thresholds, buy/sell pressure, per-config completion & instant-launch share) — `python -m dbc_pulse.pool_tracker`
 - [ ] DAMM v2 LP realized-yield tracker (fees − LVR)
 - [ ] Stream API (WebSocket/REST) + dashboard

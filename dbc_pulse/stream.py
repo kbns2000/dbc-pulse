@@ -1,0 +1,172 @@
+"""dbc-pulse stream (v2 architecture) — cheap, complete lifecycle coverage + near-real-time pool state.
+
+Why v2: the DBC program does ~25 tx/s. Fetching every transaction costs 25 RPC calls/s (2M/day) — not viable on
+a small plan. Instead:
+  1. logsSubscribe on the program (one WebSocket) classifies every tx by its "Instruction: X" logs.
+  2. Only lifecycle transactions (initialize / migration / withdraw / claims — a few per minute) are fetched
+     with getTransaction and fully decoded (event-CPI). Swaps are counted from logs (rate) and optionally sampled.
+  3. Pool state is read directly from VirtualPool accounts with getMultipleAccounts every few seconds
+     (100 pools per call): quote/base reserves, sqrt_price, fees, migration flags. Reserve deltas between polls
+     give buy/sell pressure without per-swap fetches. PoolConfig accounts (cached) give migration thresholds.
+Budget: ~1 WebSocket + ~1-2 HTTP calls/s regardless of chain volume.
+
+Usage: python -m dbc_pulse.stream            (single instance; refuses to start if another stream heartbeat is fresh)
+Output: data/lifecycle_YYYYMMDD.jsonl (decoded lifecycle events), data/state_YYYYMMDD.jsonl (pool snapshots),
+        data/pools_live.json (current state of tracked pools), data/stream_heartbeat.json
+"""
+from __future__ import annotations
+import asyncio, base64, json, os, time, glob
+from pathlib import Path
+import requests, websockets
+from .idl_decoder import IdlDecoder
+from .collector import Rpc, decode_tx, load_env, DBC_PROGRAM, DATA
+
+ROOT = Path(__file__).resolve().parent.parent
+HB = DATA / "stream_heartbeat.json"; LIVE = DATA / "pools_live.json"
+LIFECYCLE_MARKERS = ("Initialize", "Migration", "Migrate", "WithdrawLeftover", "ClaimTradingFee", "ClaimCreatorTradingFee", "CreatorWithdrawSurplus", "PartnerWithdrawSurplus", "WithdrawMigrationFee", "CreateConfig", "TransferPoolCreator")
+POLL_S = float(os.environ.get("DBC_POLL_S", "3")); MAX_TRACK_AGE_S = 6 * 3600; SWAP_SAMPLE_EVERY = int(os.environ.get("DBC_SWAP_SAMPLE", "50"))
+
+
+def _jsonl(name: str, rows: list[dict]):
+    if not rows: return
+    with (DATA / f"{name}_{time.strftime('%Y%m%d', time.gmtime())}.jsonl").open("a", encoding="utf-8") as f:
+        for r in rows: f.write(json.dumps(r, ensure_ascii=False) + "\n")
+
+
+class PoolUniverse:
+    """Tracked pools: discovered from lifecycle events, prior pools.json, and state polling."""
+    def __init__(self):
+        self.pools: dict[str, dict] = {}   # pool -> live state
+        self.configs: dict[str, dict] = {}  # config -> decoded PoolConfig (threshold etc.)
+        self.seed()
+
+    def seed(self):
+        try:
+            for k, p in json.loads((DATA / "pools.json").read_text(encoding="utf-8")).items():
+                if not p.get("curve_complete_at"): self.pools.setdefault(k, {"first_seen": time.time(), "source": "pools.json"})
+        except Exception: pass
+        try:
+            for k, p in json.loads(LIVE.read_text(encoding="utf-8")).items():
+                if not p.get("is_migrated"): self.pools.setdefault(k, {"first_seen": time.time(), "source": "pools_live.json"})
+        except Exception: pass
+
+    def add(self, pool: str, source: str):
+        self.pools.setdefault(pool, {"first_seen": time.time(), "source": source})
+
+    def prune(self):
+        now = time.time()
+        for k in list(self.pools):
+            p = self.pools[k]
+            if p.get("is_migrated") or (now - p.get("last_activity", p.get("first_seen", now)) > MAX_TRACK_AGE_S): self.pools.pop(k, None)
+
+
+class Stream:
+    def __init__(self):
+        load_env(); url = os.environ.get("SOLANA_RPC_URL")
+        if not url: raise SystemExit("SOLANA_RPC_URL not set (.env)")
+        self.rpc = Rpc(url, rps=float(os.environ.get("DBC_RPS", "4"))); self.ws_url = url.replace("https://", "wss://", 1)
+        self.dec = IdlDecoder(ROOT / "dbc_pulse" / "idl" / "dbc.json"); self.uni = PoolUniverse()
+        self.counts = {"logs": 0, "swaps": 0, "lifecycle": 0, "fetched": 0, "sampled": 0, "errors": 0}; self.swap_seen = 0; self.pending: list[tuple[str, str]] = []
+
+    # ---------- lifecycle via logs ----------
+    async def ws_loop(self):
+        while True:
+            try:
+                async with websockets.connect(self.ws_url, max_size=2 ** 23, ping_interval=20) as ws:
+                    await ws.send(json.dumps({"jsonrpc": "2.0", "id": 1, "method": "logsSubscribe", "params": [{"mentions": [DBC_PROGRAM]}, {"commitment": "confirmed"}]}))
+                    await ws.recv()
+                    async for raw in ws:
+                        msg = json.loads(raw); v = (msg.get("params") or {}).get("result", {}).get("value") or {}
+                        if not v or v.get("err"): continue
+                        logs = v.get("logs") or []; names = [l.split("Instruction: ", 1)[1] for l in logs if "Instruction: " in l]
+                        self.counts["logs"] += 1; kind = "swap" if any(n.startswith("Swap") for n in names) else "other"
+                        if any(any(n.startswith(m) for m in LIFECYCLE_MARKERS) for n in names): self.pending.append((v["signature"], "lifecycle"))
+                        elif kind == "swap":
+                            self.counts["swaps"] += 1; self.swap_seen += 1
+                            if SWAP_SAMPLE_EVERY and self.swap_seen % SWAP_SAMPLE_EVERY == 0: self.pending.append((v["signature"], "sample"))
+            except Exception as e:
+                self.counts["errors"] += 1; print(f"ws error {type(e).__name__}: {e}", flush=True); await asyncio.sleep(3)
+
+    async def fetch_loop(self):
+        while True:
+            if not self.pending: await asyncio.sleep(0.5); continue
+            sig, why = self.pending.pop(0)
+            try:
+                tx = await asyncio.to_thread(self.rpc.call, "getTransaction", [sig, {"encoding": "json", "maxSupportedTransactionVersion": 1}])
+                if not tx: continue
+                evs = decode_tx(self.dec, tx, sig); self.counts["fetched"] += 1
+                for e in evs:
+                    d = e.get("data") or {}
+                    if "pool" in d: self.uni.add(d["pool"], e["name"]); self.uni.pools[d["pool"]]["last_activity"] = time.time()
+                    if "virtual_pool" in d: self.uni.add(d["virtual_pool"], e["name"])
+                if why == "lifecycle": self.counts["lifecycle"] += len(evs); _jsonl("lifecycle", evs)
+                else: self.counts["sampled"] += len(evs); _jsonl("swap_sample", evs)
+            except Exception as e: self.counts["errors"] += 1; print(f"fetch error {type(e).__name__}: {e}", flush=True)
+
+    # ---------- state via accounts ----------
+    def _decode_pool(self, b64: str) -> dict | None:
+        raw = base64.b64decode(b64)
+        if list(raw[:8]) != [213, 224, 5, 209, 98, 69, 119, 92]: return None
+        st, _ = self.dec._read_defined("PoolState", raw, 8)
+        m = st.get("metrics") or {}
+        return dict(config=st["config"], creator=st["creator"], base_mint=st["base_mint"], quote_reserve=st["quote_reserve"], base_reserve=st["base_reserve"], sqrt_price=st["sqrt_price"],
+                    is_migrated=st["is_migrated"], is_curve_complete=bool(st.get("finish_curve_timestamp")), finish_curve_timestamp=st.get("finish_curve_timestamp"), activation_point=st["activation_point"],
+                    trading_quote_fee=m.get("total_trading_quote_fee"), trading_base_fee=m.get("total_trading_base_fee"), protocol_quote_fee=m.get("total_protocol_quote_fee"))
+
+    def _decode_config(self, b64: str) -> dict | None:
+        raw = base64.b64decode(b64); st, _ = self.dec._read_defined("PoolConfig", raw, 8)
+        return dict(quote_mint=st["quote_mint"], migration_quote_threshold=st["migration_quote_threshold"], migration_base_threshold=st.get("migration_base_threshold"), token_decimal=st.get("token_decimal"), collect_fee_mode=st.get("collect_fee_mode"), migration_option=st.get("migration_option"), migration_fee_option=st.get("migration_fee_option"))
+
+    async def poll_loop(self):
+        while True:
+            t0 = time.time(); keys = list(self.uni.pools)[:1000]; snaps = []
+            for i in range(0, len(keys), 100):
+                chunk = keys[i:i + 100]
+                try: res = await asyncio.to_thread(self.rpc.call, "getMultipleAccounts", [chunk, {"encoding": "base64"}])
+                except Exception as e: self.counts["errors"] += 1; print(f"poll error {type(e).__name__}: {e}", flush=True); continue
+                for k, acc in zip(chunk, (res or {}).get("value") or []):
+                    if not acc: self.uni.pools.pop(k, None); continue
+                    st = self._decode_pool(acc["data"][0])
+                    if not st: continue
+                    prev = self.uni.pools[k]; cfg = st["config"]
+                    if cfg not in self.uni.configs: self.uni.configs[cfg] = None   # fetched below
+                    thr = (self.uni.configs.get(cfg) or {}).get("migration_quote_threshold")
+                    dq = st["quote_reserve"] - prev.get("quote_reserve", st["quote_reserve"])
+                    prev.update(st); prev["progress_pct"] = round(100 * st["quote_reserve"] / thr, 3) if thr else None; prev["last_poll"] = t0
+                    if dq: prev["last_activity"] = t0; prev["quote_delta_buy"] = prev.get("quote_delta_buy", 0) + max(dq, 0); prev["quote_delta_sell"] = prev.get("quote_delta_sell", 0) + max(-dq, 0)
+                    snaps.append(dict(t=int(t0), pool=k, config=cfg, quote_reserve=st["quote_reserve"], base_reserve=st["base_reserve"], sqrt_price=str(st["sqrt_price"]), dq=dq, progress_pct=prev["progress_pct"], migrated=st["is_migrated"], fee_q=st["trading_quote_fee"]))
+            # fetch unknown configs (cached forever)
+            missing = [c for c, v in self.uni.configs.items() if v is None][:100]
+            if missing:
+                try:
+                    res = await asyncio.to_thread(self.rpc.call, "getMultipleAccounts", [missing, {"encoding": "base64"}])
+                    for c, acc in zip(missing, (res or {}).get("value") or []):
+                        self.uni.configs[c] = self._decode_config(acc["data"][0]) if acc else {}
+                except Exception as e: self.counts["errors"] += 1
+            _jsonl("state", [s for s in snaps if s["dq"] or s["migrated"]]); self.uni.prune()
+            try:
+                LIVE.write_text(json.dumps(self.uni.pools, ensure_ascii=False), encoding="utf-8")
+                HB.write_text(json.dumps(dict(ts=time.time(), pid=os.getpid(), pools=len(self.uni.pools), configs=len(self.uni.configs), **self.counts)), encoding="utf-8")
+            except Exception: pass
+            await asyncio.sleep(max(0.5, POLL_S - (time.time() - t0)))
+
+    async def status_loop(self):
+        while True:
+            await asyncio.sleep(60); c = self.counts
+            print(f"{time.strftime('%H:%M:%S')} logs {c['logs']} swaps {c['swaps']} lifecycle-events {c['lifecycle']} fetched {c['fetched']} sampled {c['sampled']} errors {c['errors']} · pools {len(self.uni.pools)} configs {len(self.uni.configs)}", flush=True)
+
+    async def run(self):
+        await asyncio.gather(self.ws_loop(), self.fetch_loop(), self.poll_loop(), self.status_loop())
+
+
+def another_alive(max_age: float = 90.0) -> bool:
+    try: return time.time() - json.loads(HB.read_text(encoding="utf-8"))["ts"] < max_age
+    except Exception: return False
+
+
+def main():
+    if another_alive(): print("another stream is alive (heartbeat < 90s) — exiting", flush=True); return
+    asyncio.run(Stream().run())
+
+
+if __name__ == "__main__": main()
