@@ -102,6 +102,7 @@ class LpTracker:
     def __init__(self, damm_pool: str, meta: dict):
         self.pool = damm_pool; self.meta = meta; self.prev: dict | None = None; self.t0 = None; self.v0 = None; self.p0 = None
         self.fees_q = 0.0; self.lvr_q = 0.0; self.sum_r2 = 0.0; self.n = 0; self.last_price = None; self.last_t = None; self.reserve_check = None
+        self.jumps = 0; self.max_abs_log_move = 0.0; self.liq_drops = 0   # anomaly flags: >10x price move or >50% liquidity drop inside one poll interval
 
     def update(self, st: dict, t: float) -> dict:
         o = orient(st, self.meta.get("quote_mint")); P = o["sp"] ** 2
@@ -115,8 +116,14 @@ class LpTracker:
             pv = self.prev
             a0, b0 = unit_reserves(pv["sp"], pv["sp_min"], pv["sp_max"]); hold = a0 * P + b0; stay = unit_value(o["sp"], o["sp_min"], o["sp_max"])
             self.lvr_q += max(hold - stay, 0.0)
-            self.fees_q += max(o["fee_base_g"] - pv["fee_base_g"], 0.0) * P + max(o["fee_quote_g"] - pv["fee_quote_g"], 0.0)
-            if pv["sp"] > 0 and o["sp"] > 0: self.sum_r2 += (2.0 * math.log(o["sp"] / pv["sp"])) ** 2
+            P0 = pv["sp"] ** 2
+            # base-denominated fees are valued at the lower of the interval's end-points: a fee earned in a token whose
+            # price spiked 1000x inside one interval is not worth the spike price (thin pools, liquidity pulls).
+            self.fees_q += max(o["fee_base_g"] - pv["fee_base_g"], 0.0) * min(P, P0) + max(o["fee_quote_g"] - pv["fee_quote_g"], 0.0)
+            if pv["sp"] > 0 and o["sp"] > 0:
+                r = 2.0 * math.log(o["sp"] / pv["sp"]); self.sum_r2 += r * r; self.max_abs_log_move = max(self.max_abs_log_move, abs(r))
+                if abs(r) > math.log(10.0): self.jumps += 1
+            if pv["L"] > 0 and o["L"] < 0.5 * pv["L"]: self.liq_drops += 1
             self.n += 1
         self.prev = o; self.last_price = P; self.last_t = t
         snap.update(self.summary()); return snap
@@ -128,4 +135,5 @@ class LpTracker:
         return dict(hours=round(hrs, 3), price_change_pct=round(100 * (self.last_price / self.p0 - 1), 3) if self.p0 else None, fees_pct=round(100 * self.fees_q / self.v0, 4),
                     lvr_pct=round(100 * self.lvr_q / self.v0, 4), net_pct=round(100 * (self.fees_q - self.lvr_q) / self.v0, 4), sigma_ann=round(sigma_ann, 3) if sigma_ann else None,
                     theory_lvr_pct=round(100 * (sigma_ann ** 2 / 8) * yrs, 4) if sigma_ann else None,   # CPMM full-range approximation σ²/8 per year × elapsed
-                    fees_apr_pct=round(100 * self.fees_q / self.v0 / yrs, 2) if yrs > 0 else None, lvr_apr_pct=round(100 * self.lvr_q / self.v0 / yrs, 2) if yrs > 0 else None, polls=self.n)
+                    fees_apr_pct=round(100 * self.fees_q / self.v0 / yrs, 2) if yrs > 0 else None, lvr_apr_pct=round(100 * self.lvr_q / self.v0 / yrs, 2) if yrs > 0 else None, polls=self.n,
+                    jumps=self.jumps, liq_drops=self.liq_drops, max_move_x=round(math.exp(self.max_abs_log_move), 2), clean=(self.jumps == 0 and self.liq_drops == 0))

@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>dbc-pulse</title>
+<style>
+  :root { --bg:#fafaf8; --fg:#1b1b1b; --muted:#6b6b6b; --line:#e6e4df; --card:#ffffff; --ok:#1a7f37; --bad:#c0392b; --accent:#2b5bd7; --bar:#dfe7ff; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  header { display:flex; align-items:baseline; gap:16px; padding:16px 20px; border-bottom:1px solid var(--line); background:var(--card); position:sticky; top:0; }
+  header h1 { margin:0; font-size:20px; letter-spacing:.2px; }
+  header .sub { color:var(--muted); }
+  #status { margin-left:auto; font-variant-numeric: tabular-nums; }
+  .dot { display:inline-block; width:9px; height:9px; border-radius:50%; background:var(--bad); margin-right:6px; vertical-align:middle; }
+  .dot.ok { background:var(--ok); }
+  main { padding:16px 20px; display:grid; grid-template-columns: 1fr; gap:16px; max-width:1500px; margin:0 auto; }
+  @media (min-width: 1100px) { main { grid-template-columns: 1fr 1fr; } .wide { grid-column: 1 / -1; } }
+  section { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:12px 14px; overflow:auto; }
+  section h2 { margin:0 0 6px; font-size:15px; }
+  section .hint { color:var(--muted); font-size:12px; margin-bottom:8px; }
+  table { border-collapse:collapse; width:100%; font-variant-numeric: tabular-nums; }
+  th, td { text-align:right; padding:4px 6px; border-bottom:1px solid var(--line); white-space:nowrap; }
+  th:first-child, td:first-child { text-align:left; }
+  th { color:var(--muted); font-weight:600; font-size:12px; position:sticky; top:0; background:var(--card); }
+  td.mono { font-family: ui-monospace, Menlo, Consolas, monospace; font-size:12px; }
+  .bar { position:relative; height:14px; background:var(--bar); border-radius:3px; min-width:120px; }
+  .bar i { position:absolute; left:0; top:0; bottom:0; background:var(--accent); border-radius:3px; }
+  .bar b { position:absolute; left:6px; top:-1px; font-size:11px; font-weight:600; color:#0b2a80; }
+  .pos { color:var(--ok); } .neg { color:var(--bad); } .flag { color:var(--bad); font-size:11px; }
+  .kpis { display:flex; flex-wrap:wrap; gap:10px 22px; margin-bottom:8px; }
+  .kpi small { display:block; color:var(--muted); font-size:11px; } .kpi strong { font-size:18px; font-weight:600; }
+  footer { color:var(--muted); font-size:12px; padding:8px 20px 20px; }
+  a { color:var(--accent); }
+</style>
+</head>
+<body>
+<header>
+  <h1>dbc-pulse</h1>
+  <span class="sub">Meteora Dynamic Bonding Curve · live launch analytics &amp; DAMM v2 LP realized yield</span>
+  <span id="status"><span class="dot"></span>connecting…</span>
+</header>
+<main>
+  <section class="wide">
+    <div class="kpis" id="kpis"></div>
+  </section>
+  <section>
+    <h2>Curves closest to migration</h2>
+    <div class="hint">VirtualPool accounts read every 3s · progress = quote reserve / config migration threshold · buy/sell = reserve deltas since tracking (SOL units assume 9 dp quote)</div>
+    <table id="pools"><thead><tr><th>pool</th><th>progress</th><th>quote res</th><th>buy</th><th>sell</th><th>fee</th><th>config</th></tr></thead><tbody></tbody></table>
+  </section>
+  <section>
+    <h2>DAMM v2 LP realized yield (per unit of liquidity, since migration)</h2>
+    <div class="hint">fees − LVR from on-chain state · LVR = hold-previous-composition vs stay-in-pool, summed over 10s polls · σ annualized (×) · theory = σ²/8 · <span class="flag">⚑</span> = price jump &gt;10× or liquidity pull inside one poll (excluded from aggregates)</div>
+    <table id="damm"><thead><tr><th>DAMM pool</th><th>h</th><th>price %</th><th>fees %</th><th>LVR %</th><th>net %</th><th>σ ×</th><th>σ²/8 %</th><th>chk</th><th></th></tr></thead><tbody></tbody></table>
+  </section>
+  <section class="wide">
+    <h2>Launch configs (live)</h2>
+    <div class="hint">from tracked pools; launches / completion / instant share come from the event tracker when available</div>
+    <table id="configs"><thead><tr><th>config</th><th>pools</th><th>curve done</th><th>migrated</th><th>quote res</th><th>buy</th><th>sell</th><th>launches</th><th>completion</th><th>instant</th><th>med min</th><th>med swaps</th></tr></thead><tbody></tbody></table>
+  </section>
+  <section class="wide">
+    <h2>Recent migrations (DBC → DAMM v2)</h2>
+    <table id="migs"><thead><tr><th>time (UTC)</th><th>virtual pool</th><th>DAMM pool</th><th>base mint</th><th>tx</th></tr></thead><tbody></tbody></table>
+  </section>
+</main>
+<footer>REST: /health /pools /configs /damm /events /migrations · WS: port 8791 · <a href="https://github.com/kbns2000/dbc-pulse">github.com/kbns2000/dbc-pulse</a> (MIT)</footer>
+<script>
+const $ = s => document.querySelector(s);
+const short = (k, n = 6) => k ? k.slice(0, n) + '…' + k.slice(-4) : '';
+const sol = v => (typeof v === 'number') ? (v / 1e9).toFixed(3) : '-';
+const pct = (v, d = 2) => (typeof v === 'number') ? v.toFixed(d) : '-';
+const cls = v => (typeof v === 'number') ? (v > 0 ? 'pos' : v < 0 ? 'neg' : '') : '';
+const num = (v, d = 2) => (typeof v === 'number') ? v.toFixed(d) : '-';
+async function j(url) { const r = await fetch(url); return r.json(); }
+
+function renderHealth(h) {
+  const ok = h.stream_alive; const s = h.stream || {};
+  $('#status').innerHTML = `<span class="dot ${ok ? 'ok' : ''}"></span>${ok ? 'stream live' : 'stream stale'} · hb ${h.heartbeat_age_s}s · ${new Date().toLocaleTimeString()}`;
+  $('#kpis').innerHTML = [
+    ['tracked curves', s.pools], ['configs', s.configs], ['lifecycle events', s.lifecycle], ['swaps seen', s.swaps],
+    ['migrations', s.migrations || 0], ['DAMM v2 tracked', s.damm || 0], ['rpc errors', s.errors], ['dropped tx', s.dropped || 0]
+  ].map(([k, v]) => `<div class="kpi"><small>${k}</small><strong>${v ?? '-'}</strong></div>`).join('');
+}
+function renderPools(rows) {
+  $('#pools tbody').innerHTML = rows.slice(0, 25).map(p => `<tr><td class="mono">${short(p.pool)}${p.is_curve_complete ? ' ✓' : ''}</td>
+    <td><div class="bar"><i style="width:${Math.min(100, p.progress_pct)}%"></i><b>${pct(p.progress_pct, 1)}%</b></div></td>
+    <td>${sol(p.quote_reserve)}</td><td class="pos">${sol(p.buy_quote)}</td><td class="neg">${sol(p.sell_quote)}</td><td>${sol(p.trading_quote_fee)}</td><td class="mono">${short(p.config, 4)}</td></tr>`).join('');
+}
+function renderDamm(rows) {
+  $('#damm tbody').innerHTML = rows.slice(0, 25).map(d => `<tr><td class="mono">${short(d.pool)}</td><td>${num(d.hours, 2)}</td>
+    <td class="${cls(d.price_change_pct)}">${pct(d.price_change_pct, 1)}</td><td class="pos">${pct(d.fees_pct, 3)}</td><td class="neg">${pct(d.lvr_pct, 3)}</td>
+    <td class="${cls(d.net_pct)}">${pct(d.net_pct, 3)}</td><td>${num(d.sigma_ann, 1)}</td><td>${pct(d.theory_lvr_pct, 3)}</td><td>${num(d.reserve_check, 2)}</td>
+    <td class="flag">${d.clean === false ? '⚑' : ''}</td></tr>`).join('');
+}
+function renderConfigs(rows) {
+  $('#configs tbody').innerHTML = rows.slice(0, 20).map(c => `<tr><td class="mono">${short(c.config)}</td><td>${c.pools}</td><td>${c.curve_complete}</td><td>${c.migrated}</td>
+    <td>${sol(c.quote_reserve)}</td><td class="pos">${sol(c.buy_quote)}</td><td class="neg">${sol(c.sell_quote)}</td>
+    <td>${c.launches ?? '-'}</td><td>${c.completion_rate != null ? pct(100 * c.completion_rate, 0) + '%' : '-'}</td><td>${c.instant_share != null ? pct(100 * c.instant_share, 0) + '%' : '-'}</td>
+    <td>${c.median_minutes_to_complete ?? '-'}</td><td>${c.median_swaps ?? '-'}</td></tr>`).join('');
+}
+function renderMigs(rows) {
+  $('#migs tbody').innerHTML = rows.slice().reverse().slice(0, 15).map(m => `<tr><td>${m.block_time ? new Date(m.block_time * 1000).toISOString().slice(11, 19) : '-'}</td>
+    <td class="mono">${short(m.virtual_pool)}</td><td class="mono">${short(m.damm_pool)}</td><td class="mono">${short(m.base_mint)}</td>
+    <td class="mono"><a href="https://solscan.io/tx/${m.signature}" target="_blank" rel="noopener">${short(m.signature, 8)}</a></td></tr>`).join('');
+}
+async function refresh() {
+  try {
+    const [h, p, d, c, m] = await Promise.all([j('/health'), j('/pools?limit=25'), j('/damm?limit=25'), j('/configs'), j('/migrations?n=15')]);
+    renderHealth(h); renderPools(p); renderDamm(d); renderConfigs(c); renderMigs(m);
+  } catch (e) { $('#status').innerHTML = `<span class="dot"></span>api unreachable`; }
+}
+refresh(); setInterval(refresh, 5000);
+j('/health').then(h => {   // optional live push on the port the API reports
+  try {
+    const ws = new WebSocket(`ws://${location.hostname}:${h.ws_port || 8791}/`);
+    ws.onmessage = ev => { const m = JSON.parse(ev.data); if (m.type === 'snapshot') { renderHealth(m.health); renderPools(m.pools); renderDamm(m.damm); } };
+  } catch (e) {}
+}).catch(() => {});
+</script>
+</body>
+</html>

@@ -25,15 +25,34 @@ Budget: one WebSocket plus roughly 1–2 HTTP calls/s regardless of chain volume
 - [x] Event collector (RPC signatures → transactions → event-CPI decode) — `python -m dbc_pulse.collector --backfill N` (batch) / v2 live stream `python -m dbc_pulse.stream`
 - [x] Pool state tracker (curve progress, thresholds, buy/sell pressure, per-config completion & instant-launch share) — `python -m dbc_pulse.pool_tracker`
 - [x] DAMM v2 migration mapping (`migration_damm_v2` accounts → DAMM pool) + LP realized-yield tracker per unit liquidity: fees − LVR (interval rebalancing benchmark), σ and σ²/8 theory comparison, reserve-identity self-check — `dbc_pulse/damm.py`, live in the stream (`data/migration_*.jsonl`, `data/damm_*.jsonl`, `data/damm_live.json`)
-- [ ] Stream API (WebSocket/REST) + dashboard
-- [ ] Docs, tests, pitch
+- [x] Stream API (REST + WebSocket push) + light dashboard — `python -m dbc_pulse.api` → http://127.0.0.1:8790/ (routes: /health /pools /configs /damm /events /migrations; ws://127.0.0.1:8791/)
+- [x] Tests (`python -m pytest -q`: IDL round-trip, PoolState layout, LP math incl. LVR/fees/anomaly flags, migration decoding) + GitHub Actions CI
+- [ ] Pitch deck / videos
+
+## API and dashboard
+`python -m dbc_pulse.api` reads only the files the stream writes (no RPC) and serves:
+
+| route | content |
+|---|---|
+| `/` | dashboard (curves closest to migration, DAMM v2 LP realized yield, live config table, recent migrations) |
+| `/health` | stream heartbeat, counters, API uptime |
+| `/pools?min_progress=&limit=` | tracked curves sorted by progress: reserves, buy/sell pressure, fees, config, migration flags, DAMM pool |
+| `/configs` | per launch config: pools tracked, curves completed, migrated, plus event-tracker stats (launches, completion rate, instant share) when present |
+| `/damm?limit=` | DAMM v2 pools: hours since migration, price change, fees %, LVR %, net %, σ (annualized ×), σ²/8 theory %, reserve check, anomaly flags (`jumps`, `liq_drops`, `clean`) |
+| `/events?n=` · `/migrations?n=` | last decoded lifecycle events · last DBC→DAMM v2 migrations |
+| `ws://…:8791/` | a `snapshot` message every 5s with health, top pools and DAMM rows |
+
+LP numbers are per unit of liquidity with the quote token as numéraire. Base-denominated fees are valued at the lower of the interval's two prices, and a pool with a >10× price move or a >50% liquidity pull inside one poll is flagged `clean=false` (kept, but excluded from aggregates).
 
 ## Quick start
 ```bash
 python -m venv .venv && .venv/Scripts/activate  # Windows
 pip install -r requirements.txt
 cp .env.example .env   # set SOLANA_RPC_URL
-python -m dbc_pulse.collector --since 1h
+python -m dbc_pulse.stream          # live stream (single instance)
+python -m dbc_pulse.api             # REST/WS + dashboard on :8790/:8791
+python -m dbc_pulse.view --watch 5  # console viewer
+python -m pytest -q                 # tests
 ```
 
 ## License
