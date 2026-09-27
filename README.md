@@ -18,12 +18,13 @@ dbc-pulse instead uses three cheap channels (`dbc_pulse/stream.py`):
 1. **logsSubscribe** on the program — every transaction is classified from its `Instruction:` logs; swaps are counted, lifecycle transactions (initialize, migration, withdraw, claims) are the only ones fetched and fully decoded via event-CPI.
 2. **Account polling** — tracked `VirtualPool` accounts are read with `getMultipleAccounts` (100 per call) every 3s and decoded from the IDL: reserves, sqrt price, fees, migration flags. Reserve deltas between polls give buy/sell pressure without per-swap fetches; `PoolConfig` (cached) gives the migration threshold.
 3. **Sampling** — 1 in N swap transactions is fetched for wallet-level stats.
+4. **DAMM v2 follow-through** — `migration_damm_v2` transactions are decoded from their account list (no DBC event carries the DAMM pool), and the resulting DAMM v2 `Pool` accounts are polled every 10s. Per unit of liquidity the tracker accumulates fees (from `fee_*_per_liquidity` growth) and LVR (hold-the-previous-composition vs. stay-in-pool, summed over polls), reports net realized yield, annualized σ and the σ²/8 theory line (`dbc_pulse/damm.py`).
 Budget: one WebSocket plus roughly 1–2 HTTP calls/s regardless of chain volume. A heartbeat file makes the stream single-instance.
 
 ## Status
 - [x] Event collector (RPC signatures → transactions → event-CPI decode) — `python -m dbc_pulse.collector --backfill N` (batch) / v2 live stream `python -m dbc_pulse.stream`
 - [x] Pool state tracker (curve progress, thresholds, buy/sell pressure, per-config completion & instant-launch share) — `python -m dbc_pulse.pool_tracker`
-- [ ] DAMM v2 LP realized-yield tracker (fees − LVR)
+- [x] DAMM v2 migration mapping (`migration_damm_v2` accounts → DAMM pool) + LP realized-yield tracker per unit liquidity: fees − LVR (interval rebalancing benchmark), σ and σ²/8 theory comparison, reserve-identity self-check — `dbc_pulse/damm.py`, live in the stream (`data/migration_*.jsonl`, `data/damm_*.jsonl`, `data/damm_live.json`)
 - [ ] Stream API (WebSocket/REST) + dashboard
 - [ ] Docs, tests, pitch
 

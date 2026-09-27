@@ -20,9 +20,11 @@ from pathlib import Path
 import requests, websockets
 from .idl_decoder import IdlDecoder
 from .collector import Rpc, decode_tx, load_env, DBC_PROGRAM, DATA
+from .damm import decode_migrations, DammDecoder, LpTracker
 
 ROOT = Path(__file__).resolve().parent.parent
-HB = DATA / "stream_heartbeat.json"; LIVE = DATA / "pools_live.json"
+HB = DATA / "stream_heartbeat.json"; LIVE = DATA / "pools_live.json"; DAMM_LIVE = DATA / "damm_live.json"
+DAMM_POLL_S = float(os.environ.get("DBC_DAMM_POLL_S", "10")); DAMM_MAX_AGE_S = float(os.environ.get("DBC_DAMM_MAX_AGE_H", "72")) * 3600
 LIFECYCLE_MARKERS = ("Initialize", "Migration", "Migrate", "WithdrawLeftover", "ClaimTradingFee", "ClaimCreatorTradingFee", "CreatorWithdrawSurplus", "PartnerWithdrawSurplus", "WithdrawMigrationFee", "CreateConfig", "TransferPoolCreator")
 POLL_S = float(os.environ.get("DBC_POLL_S", "3")); MAX_TRACK_AGE_S = 6 * 3600; SWAP_SAMPLE_EVERY = int(os.environ.get("DBC_SWAP_SAMPLE", "50"))
 
@@ -66,7 +68,16 @@ class Stream:
         if not url: raise SystemExit("SOLANA_RPC_URL not set (.env)")
         self.rpc = Rpc(url, rps=float(os.environ.get("DBC_RPS", "4"))); self.ws_url = url.replace("https://", "wss://", 1)
         self.dec = IdlDecoder(ROOT / "dbc_pulse" / "idl" / "dbc.json"); self.uni = PoolUniverse()
-        self.counts = {"logs": 0, "swaps": 0, "lifecycle": 0, "fetched": 0, "sampled": 0, "errors": 0}; self.swap_seen = 0; self.pending: list[tuple[str, str]] = []
+        self.damm_dec = DammDecoder(ROOT / "dbc_pulse" / "idl" / "damm_v2.json"); self.damm: dict[str, LpTracker] = {}; self._seed_damm()
+        self.counts = {"logs": 0, "swaps": 0, "lifecycle": 0, "fetched": 0, "sampled": 0, "migrations": 0, "dropped": 0, "errors": 0}; self.swap_seen = 0; self.pending: list[tuple[str, str]] = []; self.retry: list[tuple[float, str, str]] = []
+
+    def _seed_damm(self):
+        cutoff = time.time() - DAMM_MAX_AGE_S
+        for f in sorted(glob.glob(str(DATA / "migration_*.jsonl"))):
+            for line in open(f, encoding="utf-8"):
+                try: m = json.loads(line)
+                except Exception: continue
+                if m.get("version") == "damm_v2" and (m.get("block_time") or 0) >= cutoff: self.damm.setdefault(m["damm_pool"], LpTracker(m["damm_pool"], m))
 
     # ---------- lifecycle via logs ----------
     async def ws_loop(self):
@@ -89,17 +100,30 @@ class Stream:
 
     async def fetch_loop(self):
         while True:
+            now = time.time()
+            while self.retry and self.retry[0][0] <= now: _, rs, rw = self.retry.pop(0); self.pending.append((rs, rw))
             if not self.pending: await asyncio.sleep(0.5); continue
-            sig, why = self.pending.pop(0)
+            sig, why = self.pending.pop(0)[:2]; tries = 0
+            if "|" in why: why, tries = why.split("|")[0], int(why.split("|")[1])
             try:
-                tx = await asyncio.to_thread(self.rpc.call, "getTransaction", [sig, {"encoding": "json", "maxSupportedTransactionVersion": 1}])
-                if not tx: continue
+                tx = await asyncio.to_thread(self.rpc.call, "getTransaction", [sig, {"encoding": "json", "maxSupportedTransactionVersion": 1, "commitment": "confirmed"}])
+                if not tx:   # not yet available at this commitment (or dropped): retry a few times, spaced out
+                    if tries < 3: self.retry.append((time.time() + 4.0 * (tries + 1), sig, f"{why}|{tries + 1}"))
+                    else: self.counts["dropped"] += 1
+                    continue
                 evs = decode_tx(self.dec, tx, sig); self.counts["fetched"] += 1
                 for e in evs:
                     d = e.get("data") or {}
                     if "pool" in d: self.uni.add(d["pool"], e["name"]); self.uni.pools[d["pool"]]["last_activity"] = time.time()
                     if "virtual_pool" in d: self.uni.add(d["virtual_pool"], e["name"])
-                if why == "lifecycle": self.counts["lifecycle"] += len(evs); _jsonl("lifecycle", evs)
+                if why == "lifecycle":
+                    self.counts["lifecycle"] += len(evs); _jsonl("lifecycle", evs)
+                    migs = decode_migrations(tx, sig)
+                    if migs:
+                        self.counts["migrations"] += len(migs); _jsonl("migration", migs)
+                        for m in migs:
+                            if m["virtual_pool"] in self.uni.pools: self.uni.pools[m["virtual_pool"]].update(damm_pool=m["damm_pool"], migrated_at=m["block_time"], migration_version=m["version"])
+                            if m["version"] == "damm_v2": self.damm.setdefault(m["damm_pool"], LpTracker(m["damm_pool"], m))
                 else: self.counts["sampled"] += len(evs); _jsonl("swap_sample", evs)
             except Exception as e: self.counts["errors"] += 1; print(f"fetch error {type(e).__name__}: {e}", flush=True)
 
@@ -146,21 +170,62 @@ class Stream:
             _jsonl("state", [s for s in snaps if s["dq"] or s["migrated"]]); self.uni.prune()
             try:
                 LIVE.write_text(json.dumps(self.uni.pools, ensure_ascii=False), encoding="utf-8")
-                HB.write_text(json.dumps(dict(ts=time.time(), pid=os.getpid(), pools=len(self.uni.pools), configs=len(self.uni.configs), **self.counts)), encoding="utf-8")
+                HB.write_text(json.dumps(dict(ts=time.time(), pid=os.getpid(), pools=len(self.uni.pools), configs=len(self.uni.configs), damm=len(self.damm), **self.counts)), encoding="utf-8")
             except Exception: pass
             await asyncio.sleep(max(0.5, POLL_S - (time.time() - t0)))
+
+    # ---------- DAMM v2 LP realized yield ----------
+    async def damm_loop(self):
+        while True:
+            t0 = time.time(); keys = list(self.damm)[:500]; snaps = []
+            for i in range(0, len(keys), 100):
+                chunk = keys[i:i + 100]
+                try: res = await asyncio.to_thread(self.rpc.call, "getMultipleAccounts", [chunk, {"encoding": "base64", "commitment": "confirmed"}])
+                except Exception as e: self.counts["errors"] += 1; print(f"damm poll error {type(e).__name__}: {e}", flush=True); continue
+                for k, acc in zip(chunk, (res or {}).get("value") or []):
+                    tr = self.damm.get(k)
+                    if not tr: continue
+                    if not acc: tr.meta["missing"] = tr.meta.get("missing", 0) + 1; continue
+                    try: st = self.damm_dec.decode_pool(acc["data"][0])
+                    except Exception as e: self.counts["errors"] += 1; continue
+                    if not st: continue
+                    snap = tr.update(st, t0)
+                    if tr.n == 1 or (tr.prev and snap.get("price") != getattr(tr, "_last_written", None)): snaps.append(snap); tr._last_written = snap.get("price")
+            for k in list(self.damm):
+                tr = self.damm[k]
+                if (tr.t0 and t0 - tr.t0 > DAMM_MAX_AGE_S) or tr.meta.get("missing", 0) > 20: self.damm.pop(k, None)
+            _jsonl("damm", snaps)
+            try: DAMM_LIVE.write_text(json.dumps({k: dict(since=tr.meta.get("block_time"), virtual_pool=tr.meta.get("virtual_pool"), base_mint=tr.meta.get("base_mint"), quote_mint=tr.meta.get("quote_mint"), price=tr.last_price, reserve_check=tr.reserve_check, **tr.summary()) for k, tr in self.damm.items()}, ensure_ascii=False), encoding="utf-8")
+            except Exception: pass
+            await asyncio.sleep(max(1.0, DAMM_POLL_S - (time.time() - t0)))
 
     async def status_loop(self):
         while True:
             await asyncio.sleep(60); c = self.counts
-            print(f"{time.strftime('%H:%M:%S')} logs {c['logs']} swaps {c['swaps']} lifecycle-events {c['lifecycle']} fetched {c['fetched']} sampled {c['sampled']} errors {c['errors']} · pools {len(self.uni.pools)} configs {len(self.uni.configs)}", flush=True)
+            print(f"{time.strftime('%H:%M:%S')} logs {c['logs']} swaps {c['swaps']} lifecycle-events {c['lifecycle']} fetched {c['fetched']} sampled {c['sampled']} errors {c['errors']} · pools {len(self.uni.pools)} configs {len(self.uni.configs)} · migrations {c['migrations']} damm-tracked {len(self.damm)}", flush=True)
 
     async def run(self):
-        await asyncio.gather(self.ws_loop(), self.fetch_loop(), self.poll_loop(), self.status_loop())
+        await asyncio.gather(self.ws_loop(), self.fetch_loop(), self.poll_loop(), self.damm_loop(), self.status_loop())
+
+
+def _pid_alive(pid: int) -> bool:
+    """Windows-safe liveness check (never os.kill: on Windows that terminates the process)."""
+    try:
+        import ctypes
+        h = ctypes.windll.kernel32.OpenProcess(0x1000, False, int(pid))   # PROCESS_QUERY_LIMITED_INFORMATION
+        if not h: return False
+        code = ctypes.c_ulong(); ok = ctypes.windll.kernel32.GetExitCodeProcess(h, ctypes.byref(code)); ctypes.windll.kernel32.CloseHandle(h)
+        return bool(ok) and code.value == 259   # STILL_ACTIVE
+    except Exception:
+        try: os.kill(int(pid), 0); return True    # POSIX
+        except Exception: return False
 
 
 def another_alive(max_age: float = 90.0) -> bool:
-    try: return time.time() - json.loads(HB.read_text(encoding="utf-8"))["ts"] < max_age
+    try:
+        hb = json.loads(HB.read_text(encoding="utf-8"))
+        if hb.get("pid") == os.getpid(): return False
+        return time.time() - hb["ts"] < max_age and _pid_alive(hb.get("pid", -1))
     except Exception: return False
 
 
