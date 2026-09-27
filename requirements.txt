@@ -1,0 +1,3 @@
+requests>=2.31
+websockets>=12
+base58>=2.1
