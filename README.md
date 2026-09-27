@@ -31,7 +31,7 @@ Budget: one WebSocket plus roughly 1–2 HTTP calls/s regardless of chain volume
 
 ## Early measurements (mainnet, first day)
 - Program throughput swings between ~1.4 and ~24 tx/s minute to minute; in 1.4 h: 240 pools touched, 83 launched, 70 curves completed across 123 configs. Some configs graduate 100% of launches in one fill within a minute (bundled), others take a median of 137–406 swaps.
-- DAMM v2, first hour after migration (clean pools, n=7): measured LVR / (σ²/8) = 0.78–0.96; fees cover 1–3% of LVR. Pools with a >10× price move or a >50% liquidity pull inside one poll are flagged and excluded from aggregates.
+- DAMM v2, first ~1.5 h after migration (clean pools with a price move, n=203): measured LVR / (σ²/8) = 0.92 median (p10 0.75, p90 1.04); fees cover 1.3% of LVR (median); 203/203 pools net negative for LPs; median price −12%. Pools with a >10× price move or a >50% liquidity pull inside one poll (25% of tracked) are flagged and excluded from aggregates.
 - Fee ladder from `PoolConfig`: protocol 20% of trading fee → remainder split between partner (config owner) and creator (`creator_trading_fee_percentage`); partner also receives locked/unlocked LP at migration, migration fee (0–10%) and surplus. Across 319 tracked young pools: 129.6 SOL lifetime trading fees, top 3 partner wallets 66.7%, median config 0.001 SOL.
 
 ## API and dashboard
