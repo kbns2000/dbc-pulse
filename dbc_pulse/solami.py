@@ -94,7 +94,7 @@ class BlurTap:
         if t == "swap" and self.reserve_fn and msg.get("pool"):
             theirs = msg.get("quote_reserve")
             if isinstance(theirs, (int, float)) and theirs > 0:
-                self._pending[msg["pool"]] = (theirs, bt if isinstance(bt, (int, float)) and bt > 0 else now)   # newer swap replaces older
+                self._pending[msg["pool"]] = (theirs, bt if isinstance(bt, (int, float)) and bt > 0 else now, msg.get("quote_mint"), msg.get("slot"))   # newer swap replaces older
         if now - self._last_settle >= 2.0: self._settle(now)
         # "provider" = the LP wallet on liquidity events (measured 2026-09-28: raw liquidity messages carry provider, base/quote_usd,
         # decimals and indexed_at; an earlier keep-list dropped provider, so rows before this fix have no wallet).
@@ -110,23 +110,35 @@ class BlurTap:
         compared only after QUIET_S with no newer Blur swap AND once our poll is later than that swap: both sides then describe the
         same account state and should match exactly."""
         self._last_settle = now; s = self.stats
-        for pool, (theirs, bt) in list(self._pending.items()):
+        for pool, (theirs, bt, their_quote, their_slot) in list(self._pending.items()):
             if now - bt < self.QUIET_S: continue
             got = self.reserve_fn(pool)
-            ours, polled = got if isinstance(got, tuple) else (got, now)
+            if not isinstance(got, tuple): got = (got, now, None, None)
+            ours, polled, our_quote, our_slot = (tuple(got) + (None, None, None))[:4]
             if ours is None: self._pending.pop(pool, None); continue
-            if polled is None or polled < bt + 1.0:
+            if their_quote and our_quote and their_quote != our_quote:
+                # Measured 2026-09-28: on some curves Blur's "quote" is the other token (values ~1e6x apart) — a different quantity,
+                # so it is not compared. Counted separately.
+                self._pending.pop(pool, None); s["agree_orient_skip"] = s.get("agree_orient_skip", 0) + 1; continue
+            # Our read must include Blur's swap: compare slots when both are known (block_time has 1 s resolution and measured
+            # misses clustered at polls 1-3 s after the swap), else fall back to wall-clock order.
+            stale = (our_slot < their_slot) if (our_slot is not None and their_slot is not None) else (polled is None or polled < bt + 1.0)
+            if stale:
                 if now - bt > 120: self._pending.pop(pool, None); s["agree_unpolled"] = s.get("agree_unpolled", 0) + 1
                 continue
             self._pending.pop(pool, None); s["agree_n"] += 1
             if abs(ours - theirs) / theirs <= 0.02: s["agree_ok"] += 1
             if ours == theirs: s["agree_exact"] = s.get("agree_exact", 0) + 1
+            else:   # keep the last 200 disagreements for diagnosis (pool, Blur value, ours, seconds between swap and our poll)
+                miss = s.setdefault("agree_miss", [])
+                miss.append(dict(pool=pool, theirs=theirs, ours=ours, ratio=round(ours / theirs, 6), poll_after_s=round(polled - bt, 1), t=round(now)))
+                del miss[:-200]
 
     def health(self) -> dict:
         s = self.stats
         return dict(events=s["events"], by_type=s["by_type"], dex_seen=s["dex_seen"], filter_pools=s["filter_pools"],
                     lag_ms_avg=round(s["lag_ms_sum"] / s["lag_n"], 1) if s["lag_n"] else None,
-                    reserve_agreement=round(s["agree_ok"] / s["agree_n"], 4) if s["agree_n"] else None, agree_n=s["agree_n"], agree_exact=s.get("agree_exact", 0), agree_unpolled=s.get("agree_unpolled", 0),
+                    reserve_agreement=round(s["agree_ok"] / s["agree_n"], 4) if s["agree_n"] else None, agree_n=s["agree_n"], agree_exact=s.get("agree_exact", 0), agree_unpolled=s.get("agree_unpolled", 0), agree_orient_skip=s.get("agree_orient_skip", 0), agree_miss=s.get("agree_miss", [])[-200:],
                     liquidity_add=s["liq_add"], liquidity_remove=s["liq_remove"], reconnects=s["reconnects"], last_event_ts=s["last_event_ts"], last_error=s.get("last_error"),
                     swaps_total=s["swaps_total"], swaps_tracked=s["swaps_tracked"])
 

@@ -153,8 +153,11 @@ class Stream:
             t0 = time.time(); keys = self._poll_keys(); snaps = []
             for i in range(0, len(keys), 100):
                 chunk = keys[i:i + 100]
-                try: res = await asyncio.to_thread(self.rpc.call, "getMultipleAccounts", [chunk, {"encoding": "base64"}])
+                # 'confirmed': without a commitment the RPC default is 'finalized' (~13 s behind), which read pre-swap state for
+                # swaps 3-9 s old in the Blur cross-check (measured 2026-09-28) and made the dashboard lag.
+                try: res = await asyncio.to_thread(self.rpc.call, "getMultipleAccounts", [chunk, {"encoding": "base64", "commitment": "confirmed"}])
                 except Exception as e: self.counts["errors"] += 1; print(f"poll error {type(e).__name__}: {e}", flush=True); continue
+                ctx_slot = ((res or {}).get("context") or {}).get("slot")
                 for k, acc in zip(chunk, (res or {}).get("value") or []):
                     if not acc: self.uni.pools.pop(k, None); continue
                     st = self._decode_pool(acc["data"][0])
@@ -165,7 +168,7 @@ class Stream:
                     if cfgd.get("quote_mint"): prev["quote_mint"] = cfgd["quote_mint"]
                     if cfgd.get("migration_fee_pct") is not None: prev["graduation_take_pct"] = cfgd["migration_fee_pct"]; prev["graduation_take_creator_pct"] = cfgd.get("creator_migration_fee_pct")
                     dq = st["quote_reserve"] - prev.get("quote_reserve", st["quote_reserve"])
-                    prev.update(st); prev["progress_pct"] = round(100 * st["quote_reserve"] / thr, 3) if thr else None; prev["last_poll"] = t0
+                    prev.update(st); prev["progress_pct"] = round(100 * st["quote_reserve"] / thr, 3) if thr else None; prev["last_poll"] = t0; prev["poll_slot"] = ctx_slot
                     if dq: prev["last_activity"] = t0; prev["quote_delta_buy"] = prev.get("quote_delta_buy", 0) + max(dq, 0); prev["quote_delta_sell"] = prev.get("quote_delta_sell", 0) + max(-dq, 0)
                     snaps.append(dict(t=int(t0), pool=k, config=cfg, quote_reserve=st["quote_reserve"], base_reserve=st["base_reserve"], sqrt_price=str(st["sqrt_price"]), dq=dq, progress_pct=prev["progress_pct"], migrated=st["is_migrated"], fee_q=st["trading_quote_fee"]))
             # fetch unknown configs (cached forever)
@@ -246,7 +249,7 @@ class Stream:
 
     def _our_quote_reserve(self, pool):
         p = self.uni.pools.get(pool)
-        if p and p.get("quote_reserve"): return p["quote_reserve"] + (p.get("unclaimed_quote_fee") or 0), p.get("last_poll")   # vault balance (what Blur reports), poll time
+        if p and p.get("quote_reserve"): return p["quote_reserve"] + (p.get("unclaimed_quote_fee") or 0), p.get("last_poll"), p.get("quote_mint"), p.get("poll_slot")   # vault balance (what Blur reports), poll time, quote mint, slot of our read
         tr = self.damm.get(pool)
         if tr and tr.prev: return None   # DAMM reserves are per-unit in the tracker; agreement check uses DBC curves only
         return None

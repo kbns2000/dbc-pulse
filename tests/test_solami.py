@@ -64,3 +64,19 @@ def test_poll_keys_cover_busy_and_rotate():
     for _ in range(4):
         ks = st._poll_keys(); assert len(ks) == 1000 and "P1499" in ks; seen |= set(ks)
     assert len(seen) == 1500   # every pool read within a few cycles
+
+
+def test_orientation_mismatch_not_compared():
+    tap = BlurTap("K", lambda: ["P"], reserve_fn=lambda p: (283_172_114_466, 2_000.0, "SOLMINT"))
+    tap.handle({"type": "swap", "pool": "P", "quote_reserve": 968_973_530_653_117_210, "quote_mint": "TOKENMINT", "block_time": 1_000.0}, now=1_000.5)
+    tap._settle(1_020.0); h = tap.health()
+    assert h["agree_n"] == 0 and h["agree_orient_skip"] == 1
+
+
+def test_slot_order_required_when_known():
+    polls = {"P": (110, 5_000.0, None, 99)}          # poll slot 99 < swap slot 100: stale even though wall-clock is later
+    tap = BlurTap("K", lambda: ["P"], reserve_fn=lambda p: polls.get(p))
+    tap.handle({"type": "swap", "pool": "P", "quote_reserve": 110, "slot": 100, "block_time": 1_000.0}, now=1_000.5)
+    tap._settle(1_020.0); assert tap.health()["agree_n"] == 0
+    polls["P"] = (110, 5_001.0, None, 100); tap._settle(1_021.0)
+    h = tap.health(); assert h["agree_n"] == 1 and h["agree_exact"] == 1
