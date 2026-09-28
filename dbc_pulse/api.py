@@ -57,7 +57,8 @@ def pools(min_progress: float = 0.0, limit: int = 100) -> list[dict]:
         if prog < min_progress: continue
         out.append(dict(pool=k, config=p.get("config"), base_mint=p.get("base_mint"), creator=p.get("creator"), progress_pct=prog, quote_mint=p.get("quote_mint"), quote_reserve=p.get("quote_reserve"), base_reserve=p.get("base_reserve"),
                         buy_quote=p.get("quote_delta_buy", 0), sell_quote=p.get("quote_delta_sell", 0), trading_quote_fee=p.get("trading_quote_fee"), is_curve_complete=p.get("is_curve_complete"), is_migrated=p.get("is_migrated"),
-                        damm_pool=p.get("damm_pool"), first_seen=p.get("first_seen"), last_activity=p.get("last_activity"), source=p.get("source")))
+                        damm_pool=p.get("damm_pool"), first_seen=p.get("first_seen"), last_activity=p.get("last_activity"), source=p.get("source"),
+                        graduation_take_pct=p.get("graduation_take_pct"), graduation_take_creator_pct=p.get("graduation_take_creator_pct")))
     out.sort(key=lambda r: -r["progress_pct"]); return out[:limit]
 
 
@@ -65,6 +66,7 @@ def configs() -> list[dict]:
     live = _read("pools_live.json", {}); agg = defaultdict(lambda: dict(config=None, pools=0, curve_complete=0, migrated=0, quote_reserve=0.0, buy_quote=0.0, sell_quote=0.0))
     for k, p in live.items():
         c = p.get("config") or "unknown"; a = agg[c]; a["config"] = c; a["pools"] += 1
+        if p.get("graduation_take_pct") is not None: a["graduation_take_pct"] = p["graduation_take_pct"]; a["graduation_take_creator_pct"] = p.get("graduation_take_creator_pct")
         if p.get("is_curve_complete"): a["curve_complete"] += 1
         if p.get("is_migrated"): a["migrated"] += 1
         a["quote_reserve"] += p.get("quote_reserve") or 0; a["buy_quote"] += p.get("quote_delta_buy", 0) or 0; a["sell_quote"] += p.get("quote_delta_sell", 0) or 0

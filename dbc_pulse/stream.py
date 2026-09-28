@@ -112,6 +112,7 @@ class Stream:
                     if tries < 3: self.retry.append((time.time() + 4.0 * (tries + 1), sig, f"{why}|{tries + 1}"))
                     else: self.counts["dropped"] += 1
                     continue
+                if not tx.get("blockTime"): tx["blockTime"] = await asyncio.to_thread(self._block_time, tx.get("slot"))
                 evs = decode_tx(self.dec, tx, sig); self.counts["fetched"] += 1
                 for e in evs:
                     d = e.get("data") or {}
@@ -141,7 +142,11 @@ class Stream:
 
     def _decode_config(self, b64: str) -> dict | None:
         raw = base64.b64decode(b64); st, _ = self.dec._read_defined("PoolConfig", raw, 8)
-        return dict(quote_mint=st["quote_mint"], migration_quote_threshold=st["migration_quote_threshold"], migration_base_threshold=st.get("migration_base_threshold"), token_decimal=st.get("token_decimal"), collect_fee_mode=st.get("collect_fee_mode"), migration_option=st.get("migration_option"), migration_fee_option=st.get("migration_fee_option"))
+        return dict(quote_mint=st["quote_mint"], migration_quote_threshold=st["migration_quote_threshold"], migration_base_threshold=st.get("migration_base_threshold"), token_decimal=st.get("token_decimal"), collect_fee_mode=st.get("collect_fee_mode"), migration_option=st.get("migration_option"), migration_fee_option=st.get("migration_fee_option"),
+                    # graduation take: % of the raised quote paid out at migration, and the creator's share of it. Measured 2026-09-28: a config
+                    # with 95% / creator 100% sent 50.36 of 53.01 SOL raised to the creator at graduation, leaving 2.65 SOL of liquidity.
+                    migration_fee_pct=st.get("migration_fee_percentage"), creator_migration_fee_pct=st.get("creator_migration_fee_percentage"),
+                    creator_trading_fee_pct=st.get("creator_trading_fee_percentage"), fee_claimer=st.get("fee_claimer"))
 
     async def poll_loop(self):
         while True:
@@ -158,6 +163,7 @@ class Stream:
                     if cfg not in self.uni.configs: self.uni.configs[cfg] = None   # fetched below
                     cfgd = self.uni.configs.get(cfg) or {}; thr = cfgd.get("migration_quote_threshold")
                     if cfgd.get("quote_mint"): prev["quote_mint"] = cfgd["quote_mint"]
+                    if cfgd.get("migration_fee_pct") is not None: prev["graduation_take_pct"] = cfgd["migration_fee_pct"]; prev["graduation_take_creator_pct"] = cfgd.get("creator_migration_fee_pct")
                     dq = st["quote_reserve"] - prev.get("quote_reserve", st["quote_reserve"])
                     prev.update(st); prev["progress_pct"] = round(100 * st["quote_reserve"] / thr, 3) if thr else None; prev["last_poll"] = t0
                     if dq: prev["last_activity"] = t0; prev["quote_delta_buy"] = prev.get("quote_delta_buy", 0) + max(dq, 0); prev["quote_delta_sell"] = prev.get("quote_delta_sell", 0) + max(-dq, 0)
@@ -206,6 +212,20 @@ class Stream:
         while True:
             await asyncio.sleep(60); c = self.counts
             print(f"{time.strftime('%H:%M:%S')} logs {c['logs']} swaps {c['swaps']} lifecycle-events {c['lifecycle']} fetched {c['fetched']} sampled {c['sampled']} errors {c['errors']} · pools {len(self.uni.pools)} configs {len(self.uni.configs)} · migrations {c['migrations']} damm-tracked {len(self.damm)}", flush=True)
+
+    def _block_time(self, slot) -> int:
+        """Measured 2026-09-28 on Solami: getTransaction at 'confirmed' right after confirmation returned blockTime 0 for 62 of 82
+        migrations (a re-fetch minutes later returned the real time). A zero time silently dropped those pools from LP tracking on
+        restart. Ask getBlockTime(slot); if that is not available yet, use the receive time (seconds off) and count it."""
+        cache = self.__dict__.setdefault("_bt_cache", {})
+        if slot in cache: return cache[slot]
+        bt = None
+        try: bt = self.rpc.call("getBlockTime", [slot])
+        except Exception: bt = None
+        if not bt: bt = int(time.time()); self.counts["block_time_local"] = self.counts.get("block_time_local", 0) + 1
+        else: self.counts["block_time_rpc"] = self.counts.get("block_time_rpc", 0) + 1
+        if len(cache) > 5000: cache.clear()
+        cache[slot] = bt; return bt
 
     def _poll_keys(self, cap: int = 1000, hot: int = 700) -> list:
         """Pools to read this cycle. The old rule took the first `cap` pools in insertion order, so once the universe grew past

@@ -46,7 +46,7 @@
   </section>
   <section>
     <h2>Curves closest to migration</h2>
-    <div class="hint">VirtualPool accounts read every 3s · progress = quote reserve / config migration threshold · buy/sell = reserve deltas since tracking · amounts shown in whole quote tokens for SOL, USDC and USDT; other quote mints are shown raw with their mint</div>
+    <div class="hint">VirtualPool accounts read every 3s · progress = quote reserve / config migration threshold · buy/sell = reserve deltas since tracking · amounts shown in whole quote tokens for SOL, USDC and USDT; other quote mints are shown raw with their mint · ⚑ = config pays ≥20% of the raise out at graduation instead of seeding the pool</div>
     <table id="pools"><thead><tr><th>pool</th><th>progress</th><th>quote res</th><th>buy</th><th>sell</th><th>fee</th><th>quote</th><th>config</th></tr></thead><tbody></tbody></table>
   </section>
   <section>
@@ -57,7 +57,7 @@
   <section class="wide">
     <h2>Launch configs (live)</h2>
     <div class="hint">from tracked pools; launches / completion / instant share come from the event tracker when available</div>
-    <table id="configs"><thead><tr><th>config</th><th>pools</th><th>curve done</th><th>migrated</th><th>quote res</th><th>buy</th><th>sell</th><th>launches</th><th>completion</th><th>instant</th><th>med min</th><th>med swaps</th></tr></thead><tbody></tbody></table>
+    <table id="configs"><thead><tr><th>config</th><th>pools</th><th>curve done</th><th>migrated</th><th>quote res</th><th>buy</th><th>sell</th><th>launches</th><th>completion</th><th>instant</th><th>med min</th><th>med swaps</th><th>graduation take</th></tr></thead><tbody></tbody></table>
   </section>
   <section class="wide">
     <h2>Recent migrations (DBC → DAMM v2)</h2>
@@ -91,8 +91,11 @@ function renderHealth(h) {
   ] : []).concat([['provider', s.provider || '-']])
    .map(([k, v]) => `<div class="kpi"><small>${k}</small><strong>${v ?? '-'}</strong></div>`).join('');
 }
+// Graduation take: share of the raised quote the config pays out at migration (to creator/partner) instead of seeding the pool.
+const takeFlag = p => (p.graduation_take_pct >= 20) ? ` <span class="flag" title="config pays ${p.graduation_take_pct}% of the raised quote out at graduation (${p.graduation_take_creator_pct ?? 0}% of that to the creator); only the rest becomes pool liquidity">⚑ ${p.graduation_take_pct}% out at graduation</span>` : '';
+const takeCell = c => (c.graduation_take_pct == null) ? '-' : `<span class="${c.graduation_take_pct >= 20 ? 'flag' : ''}">${c.graduation_take_pct}%${c.graduation_take_pct ? ' (creator ' + (c.graduation_take_creator_pct ?? 0) + '%)' : ''}</span>`;
 function renderPools(rows) {
-  $('#pools tbody').innerHTML = rows.slice(0, 25).map(p => `<tr><td class="mono">${short(p.pool)}${p.is_curve_complete ? ' ✓' : ''}</td>
+  $('#pools tbody').innerHTML = rows.slice(0, 25).map(p => `<tr><td class="mono">${short(p.pool)}${p.is_curve_complete ? ' ✓' : ''}${takeFlag(p)}</td>
     <td><div class="bar"><i style="width:${Math.min(100, p.progress_pct)}%"></i><b>${pct(p.progress_pct, 1)}%</b></div></td>
     <td>${sol(p.quote_reserve, p.quote_mint)}</td><td class="pos">${sol(p.buy_quote, p.quote_mint)}</td><td class="neg">${sol(p.sell_quote, p.quote_mint)}</td><td>${sol(p.trading_quote_fee, p.quote_mint)}</td><td class="mono">${qlabel(p.quote_mint)}</td><td class="mono">${short(p.config, 4)}</td></tr>`).join('');
 }
@@ -106,7 +109,7 @@ function renderConfigs(rows) {
   $('#configs tbody').innerHTML = rows.slice(0, 20).map(c => `<tr><td class="mono">${short(c.config)}</td><td>${c.pools}</td><td>${c.curve_complete}</td><td>${c.migrated}</td>
     <td>${sol(c.quote_reserve)}</td><td class="pos">${sol(c.buy_quote)}</td><td class="neg">${sol(c.sell_quote)}</td>
     <td>${c.launches ?? '-'}</td><td>${c.completion_rate != null ? pct(100 * c.completion_rate, 0) + '%' : '-'}</td><td>${c.instant_share != null ? pct(100 * c.instant_share, 0) + '%' : '-'}</td>
-    <td>${c.median_minutes_to_complete ?? '-'}</td><td>${c.median_swaps ?? '-'}</td></tr>`).join('');
+    <td>${c.median_minutes_to_complete ?? '-'}</td><td>${c.median_swaps ?? '-'}</td><td>${takeCell(c)}</td></tr>`).join('');
 }
 function renderMigs(rows) {
   $('#migs tbody').innerHTML = rows.slice().reverse().slice(0, 15).map(m => `<tr><td>${m.block_time ? new Date(m.block_time * 1000).toISOString().slice(11, 19) : '-'}</td>
