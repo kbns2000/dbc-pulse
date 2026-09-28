@@ -37,6 +37,8 @@ Budget: one WebSocket plus roughly 1–2 HTTP calls/s regardless of chain volume
 - Graduation take (`PoolConfig.migration_fee_percentage` × creator share): of 600 decoded live configs, 521 take 0%, 35 take 20% and 23 take 99% of the raised quote at graduation, all of it to the creator in the 99% group. One such curve raised 53.01 SOL, paid 50.36 SOL to its creator (also the partner wallet) at graduation and left a pool that now holds 0.114 SOL. The dashboard flags ⚑ curves whose config takes ≥20%; 108 of 1,171 live curves carried the flag.
 
 ## Running on Solami (RPC + WebSocket + Blur)
+Demo on Solami (2:16): https://youtu.be/ntktsXHY6Cs
+
 dbc-pulse can run entirely on [Solami](https://solami.dev) and adds Solami **Blur** (decoded market data) as a second, independent feed next to its own IDL decoder.
 
 | env (dbc_pulse/.env) | effect |
