@@ -59,9 +59,13 @@ class BlurTap:
     """
 
     def __init__(self, key: str, pools_fn, reserve_fn=None, refresh_s: float = 60.0):
-        self.url = solami_urls(key)["blur"]; self.pools_fn = pools_fn; self.reserve_fn = reserve_fn; self.refresh_s = refresh_s
+        # Server-side filter goes in the connect URL (measured 2026-09-28: a 3,334-pool text-frame filter was ignored and the
+        # whole firehose arrived). Only the two Meteora venues: meteora_dbc (curves) and meteora_damm2 (graduated pools).
+        # Swaps are written to disk only for pools dbc-pulse tracks; everything else is counted.
+        self.url = solami_urls(key)["blur"] + "&type=" + ",".join(BLUR_TYPES) + "&dex=meteora_dbc,meteora_damm2&metadata=false"
+        self.pools_fn = pools_fn; self.reserve_fn = reserve_fn; self.refresh_s = refresh_s; self._tracked: set = set()
         self.stats = {"events": 0, "by_type": {}, "dex_seen": {}, "lag_ms_sum": 0.0, "lag_n": 0, "agree_n": 0, "agree_ok": 0,
-                      "liq_add": 0, "liq_remove": 0, "reconnects": 0, "last_event_ts": None, "filter_pools": 0}
+                      "liq_add": 0, "liq_remove": 0, "reconnects": 0, "last_event_ts": None, "filter_pools": 0, "swaps_total": 0, "swaps_tracked": 0}
 
     def _filter(self) -> dict:
         pools = sorted({p for p in (self.pools_fn() or []) if p})[:5000]
@@ -71,7 +75,7 @@ class BlurTap:
     def handle(self, msg: dict, now: float | None = None) -> dict | None:
         """Update counters for one decoded Blur event; returns the compact row written to disk (or None to skip)."""
         now = now or time.time(); t = msg.get("type")
-        if not t or t == "metadata": return None
+        if not t or t in ("metadata", "connected", "replay_end", "pong"): return None
         s = self.stats; s["events"] += 1; s["by_type"][t] = s["by_type"].get(t, 0) + 1; s["last_event_ts"] = now
         dex = msg.get("dex") or msg.get("launchpad")
         if dex: s["dex_seen"][dex] = s["dex_seen"].get(dex, 0) + 1
@@ -97,24 +101,36 @@ class BlurTap:
         return dict(events=s["events"], by_type=s["by_type"], dex_seen=s["dex_seen"], filter_pools=s["filter_pools"],
                     lag_ms_avg=round(s["lag_ms_sum"] / s["lag_n"], 1) if s["lag_n"] else None,
                     reserve_agreement=round(s["agree_ok"] / s["agree_n"], 4) if s["agree_n"] else None, agree_n=s["agree_n"],
-                    liquidity_add=s["liq_add"], liquidity_remove=s["liq_remove"], reconnects=s["reconnects"], last_event_ts=s["last_event_ts"])
+                    liquidity_add=s["liq_add"], liquidity_remove=s["liq_remove"], reconnects=s["reconnects"], last_event_ts=s["last_event_ts"], last_error=s.get("last_error"),
+                    swaps_total=s["swaps_total"], swaps_tracked=s["swaps_tracked"])
 
     async def run(self):
         import websockets
         while True:
             try:
                 async with websockets.connect(self.url, max_size=2 ** 23, ping_interval=20) as ws:
-                    await ws.send(json.dumps(self._filter())); last_refresh = time.time()
+                    last_refresh = 0.0
                     async for raw in ws:
                         try: msg = json.loads(raw)
                         except Exception: continue
-                        row = self.handle(msg)
-                        if row:
-                            with (DATA / f"blur_{time.strftime('%Y%m%d', time.gmtime())}.jsonl").open("a", encoding="utf-8") as f:
-                                f.write(json.dumps(row, ensure_ascii=False) + "\n")
                         if time.time() - last_refresh > self.refresh_s:
-                            await ws.send(json.dumps(self._filter())); last_refresh = time.time()
+                            self._tracked = {p for p in (self.pools_fn() or []) if p}; self.stats["filter_pools"] = len(self._tracked); last_refresh = time.time()
                             try: (DATA / "blur_health.json").write_text(json.dumps(dict(ts=time.time(), **self.health()), ensure_ascii=False), encoding="utf-8")
                             except Exception: pass
+                        row = self.handle(msg)
+                        if not row: continue
+                        if row.get("type") == "swap":
+                            self.stats["swaps_total"] += 1
+                            if row.get("pool") not in self._tracked: continue
+                            self.stats["swaps_tracked"] += 1
+                        with (DATA / f"blur_{time.strftime('%Y%m%d', time.gmtime())}.jsonl").open("a", encoding="utf-8") as f:
+                            f.write(json.dumps(row, ensure_ascii=False) + "\n")
             except Exception as e:
-                self.stats["reconnects"] += 1; print(f"blur error {type(e).__name__}: {e}", flush=True); await asyncio.sleep(5)
+                self.stats["reconnects"] += 1; wait = min(600, 5 * (2 ** min(self.stats["reconnects"], 7)))
+                resp = getattr(e, "response", None); code = getattr(resp, "status_code", None)
+                if code in (401, 403):   # 권한 없는 키(예: DataApi 누락) — 반복 접속은 무의미하니 15분 간격으로만 재시도
+                    body = bytes(getattr(resp, "body", b"") or b"")[:200].decode("utf-8", "replace")
+                    self.stats["last_error"] = f"{code} {body}"; wait = 900
+                else:
+                    self.stats["last_error"] = f"{type(e).__name__}: {str(e)[:120]}"
+                print(f"blur error ({self.stats['last_error']}) — retry in {wait}s", flush=True); await asyncio.sleep(wait)

@@ -48,6 +48,8 @@ The Blur tap subscribes to `swap`, `liquidity`, `pool_create`, `graduation` and 
 - event lag (receive time − block time) and events per type (stream health),
 - reserve agreement: Blur's quote reserve vs our polled VirtualPool reserve for the same pool (decoder cross-check).
 
+Blur names the two venues `meteora_dbc` (bonding curves) and `meteora_damm2` (graduated pools). The key needs a role with the **DataApi** permission (dashboard → Members → New role → Data API, then attach it to the key under API Keys → Settings).
+
 ## API and dashboard
 `python -m dbc_pulse.api` reads only the files the stream writes (no RPC) and serves:
 
