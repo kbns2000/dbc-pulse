@@ -54,8 +54,8 @@ class BlurTap:
     QUIET_S = 8.0
     """Streams Blur events for the pools dbc-pulse tracks and keeps simple health/agreement counters.
 
-    pools_fn() -> iterable of pool addresses to follow (DBC virtual pools + DAMM v2 pools). The filter is refreshed
-    every `refresh_s` by sending a text frame, so newly migrated pools are followed without reconnecting.
+    pools_fn() -> iterable of pool addresses dbc-pulse tracks (DBC virtual pools + DAMM v2 pools). The server-side filter is
+    the connect URL (types + the two Meteora venues); the tracked set, refreshed every `refresh_s`, decides which swaps are written.
     reserve_fn(pool) -> our latest quote reserve for that pool (raw units) or None, for the agreement check. Blur reports the quote
     VAULT balance for DBC curves = VirtualPool.quote_reserve + unclaimed protocol/partner/creator quote fees (measured 2026-09-28 on
     26 live pools: 14 exact matches on the vault definition, 0 on the bare reserve), so reserve_fn must return reserve + unclaimed fees.
