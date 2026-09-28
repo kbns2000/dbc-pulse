@@ -12,6 +12,8 @@ Real-time data stream and analytics for **Meteora Dynamic Bonding Curve (DBC)** 
 
 Program: `dbcij3LWUppWqq96dh6gJWwBifmcGfLSB5D4DuSMaqN` (mainnet & devnet). Built during Colosseum Crypto World's Fair 2026 for the Meteora DBC side track.
 
+**Public feed (no key, refreshed hourly):** https://github.com/kbns2000/dbc-pulse/tree/feed — `summary.json`, `configs.json` (per-config completion, instant share, graduation take), `graduation_take_flags.json`, `partner_revenue.json` via `https://raw.githubusercontent.com/kbns2000/dbc-pulse/feed/feed/<file>`.
+
 ## Architecture (v2)
 The program does ~25 tx/s in busy minutes, so per-transaction fetching is not viable on a small RPC plan (2M calls/day).
 dbc-pulse instead uses three cheap channels (`dbc_pulse/stream.py`):
