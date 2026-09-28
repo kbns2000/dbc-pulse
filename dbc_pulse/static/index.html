@@ -81,7 +81,11 @@ function renderHealth(h) {
   $('#kpis').innerHTML = [
     ['tracked curves', s.pools], ['configs', s.configs], ['lifecycle events', s.lifecycle], ['swaps seen', s.swaps],
     ['migrations', s.migrations || 0], ['DAMM v2 tracked', s.damm || 0], ['rpc errors', s.errors], ['dropped tx', s.dropped || 0]
-  ].map(([k, v]) => `<div class="kpi"><small>${k}</small><strong>${v ?? '-'}</strong></div>`).join('');
+  ].concat(s.blur ? [
+    ['Solami Blur events', s.blur.events], ['Blur lag ms', s.blur.lag_ms_avg], ['reserve agreement', s.blur.reserve_agreement != null ? (100 * s.blur.reserve_agreement).toFixed(1) + '%' : '-'],
+    ['LP adds / removes', `${s.blur.liquidity_add} / ${s.blur.liquidity_remove}`]
+  ] : []).concat([['provider', s.provider || '-']])
+   .map(([k, v]) => `<div class="kpi"><small>${k}</small><strong>${v ?? '-'}</strong></div>`).join('');
 }
 function renderPools(rows) {
   $('#pools tbody').innerHTML = rows.slice(0, 25).map(p => `<tr><td class="mono">${short(p.pool)}${p.is_curve_complete ? ' ✓' : ''}</td>
