@@ -136,7 +136,8 @@ class Stream:
         m = st.get("metrics") or {}
         return dict(config=st["config"], creator=st["creator"], base_mint=st["base_mint"], quote_reserve=st["quote_reserve"], base_reserve=st["base_reserve"], sqrt_price=st["sqrt_price"],
                     is_migrated=st["is_migrated"], is_curve_complete=bool(st.get("finish_curve_timestamp")), finish_curve_timestamp=st.get("finish_curve_timestamp"), activation_point=st["activation_point"],
-                    trading_quote_fee=m.get("total_trading_quote_fee"), trading_base_fee=m.get("total_trading_base_fee"), protocol_quote_fee=m.get("total_protocol_quote_fee"))
+                    trading_quote_fee=m.get("total_trading_quote_fee"), trading_base_fee=m.get("total_trading_base_fee"), protocol_quote_fee=m.get("total_protocol_quote_fee"),
+                    unclaimed_quote_fee=sum(int(st.get(k) or 0) for k in ("protocol_quote_fee", "partner_quote_fee", "creator_quote_fee")))
 
     def _decode_config(self, b64: str) -> dict | None:
         raw = base64.b64decode(b64); st, _ = self.dec._read_defined("PoolConfig", raw, 8)
@@ -144,7 +145,7 @@ class Stream:
 
     async def poll_loop(self):
         while True:
-            t0 = time.time(); keys = list(self.uni.pools)[:1000]; snaps = []
+            t0 = time.time(); keys = self._poll_keys(); snaps = []
             for i in range(0, len(keys), 100):
                 chunk = keys[i:i + 100]
                 try: res = await asyncio.to_thread(self.rpc.call, "getMultipleAccounts", [chunk, {"encoding": "base64"}])
@@ -206,12 +207,26 @@ class Stream:
             await asyncio.sleep(60); c = self.counts
             print(f"{time.strftime('%H:%M:%S')} logs {c['logs']} swaps {c['swaps']} lifecycle-events {c['lifecycle']} fetched {c['fetched']} sampled {c['sampled']} errors {c['errors']} · pools {len(self.uni.pools)} configs {len(self.uni.configs)} · migrations {c['migrations']} damm-tracked {len(self.damm)}", flush=True)
 
+    def _poll_keys(self, cap: int = 1000, hot: int = 700) -> list:
+        """Pools to read this cycle. The old rule took the first `cap` pools in insertion order, so once the universe grew past
+        1,000 the newest pools were never read (measured 2026-09-28: 427 of 1,395 unpolled, including the two busiest curves at
+        ~5,000 Blur swaps / 30 min). Now: the `hot` most recently active pools every cycle + a rotating window over the rest."""
+        allk = list(self.uni.pools)
+        if len(allk) <= cap: return allk
+        act = sorted(allk, key=lambda k: -(self.uni.pools[k].get("last_activity") or self.uni.pools[k].get("first_seen") or 0))
+        rest = act[hot:]; n = cap - hot; i = getattr(self, "_rr", 0) % len(rest); self._rr = i + n
+        return act[:hot] + (rest[i:i + n] + rest[:max(0, i + n - len(rest))])
+
+    def _mark_active(self, pool):
+        p = self.uni.pools.get(pool)
+        if p is not None: p["last_activity"] = time.time()
+
     def _blur_pools(self):
         return list(self.uni.pools) + list(self.damm)
 
     def _our_quote_reserve(self, pool):
         p = self.uni.pools.get(pool)
-        if p and p.get("quote_reserve"): return p["quote_reserve"]
+        if p and p.get("quote_reserve"): return p["quote_reserve"] + (p.get("unclaimed_quote_fee") or 0), p.get("last_poll")   # vault balance (what Blur reports), poll time
         tr = self.damm.get(pool)
         if tr and tr.prev: return None   # DAMM reserves are per-unit in the tracker; agreement check uses DBC curves only
         return None
@@ -220,7 +235,7 @@ class Stream:
         tasks = [self.ws_loop(), self.fetch_loop(), self.poll_loop(), self.damm_loop(), self.status_loop()]
         key = solami_key()
         if key and os.environ.get("DBC_BLUR", "1") != "0":
-            self.blur = BlurTap(key, self._blur_pools, self._our_quote_reserve); tasks.append(self.blur.run())
+            self.blur = BlurTap(key, self._blur_pools, self._our_quote_reserve); self.blur.activity_fn = self._mark_active; tasks.append(self.blur.run())
         await asyncio.gather(*tasks)
 
 

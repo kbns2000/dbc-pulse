@@ -44,9 +44,10 @@ dbc-pulse can run entirely on [Solami](https://solami.dev) and adds Solami **Blu
 | `DBC_BLUR=0` | disable the Blur tap (on by default when a key is set; needs the DataApi permission) |
 
 The Blur tap subscribes to `swap`, `liquidity`, `pool_create`, `graduation` and `meme` events **for exactly the pools dbc-pulse tracks** (filter refreshed every 60 s as pools migrate), writes `data/blur_*.jsonl`, and reports in the heartbeat / `data/blur_health.json`:
-- liquidity adds/removes per DAMM v2 pool with the provider wallet (liquidity movement in/out),
+- liquidity adds/removes per DAMM v2 pool with the provider wallet (Blur's `provider` field) and USD value (liquidity movement in/out),
 - event lag (receive time − block time) and events per type (stream health),
-- reserve agreement: Blur's quote reserve vs our polled VirtualPool reserve for the same pool (decoder cross-check).
+- reserve agreement: Blur's quote reserve vs our polled VirtualPool state for the same pool (decoder cross-check). Two things matter: Blur reports the quote vault balance (`quote_reserve` + unclaimed protocol/partner/creator quote fees), and busy curves trade several times per second, so a pool is compared only after 8 s with no newer Blur swap and once our poll is later than that swap. Measured 2026-09-28 on mainnet: 96/96 within 2%, 94/96 identical (the instant comparison against the bare reserve had given 0 exact matches).
+- Polling covers every tracked curve: the most recently active 700 each cycle (Blur swaps mark activity) plus a rotating window over the rest. An earlier first-1,000 cap left the newest curves unread, including one that took 5,008 swaps from 207 wallets in 12 minutes before graduating.
 
 Blur names the two venues `meteora_dbc` (bonding curves) and `meteora_damm2` (graduated pools). The key needs a role with the **DataApi** permission (dashboard → Members → New role → Data API, then attach it to the key under API Keys → Settings).
 

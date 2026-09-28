@@ -46,7 +46,7 @@
   </section>
   <section>
     <h2>Curves closest to migration</h2>
-    <div class="hint">VirtualPool accounts read every 3s · progress = quote reserve / config migration threshold · buy/sell = reserve deltas since tracking · amounts shown in whole quote tokens for SOL (9 dp); other quote mints are shown raw with their mint</div>
+    <div class="hint">VirtualPool accounts read every 3s · progress = quote reserve / config migration threshold · buy/sell = reserve deltas since tracking · amounts shown in whole quote tokens for SOL, USDC and USDT; other quote mints are shown raw with their mint</div>
     <table id="pools"><thead><tr><th>pool</th><th>progress</th><th>quote res</th><th>buy</th><th>sell</th><th>fee</th><th>quote</th><th>config</th></tr></thead><tbody></tbody></table>
   </section>
   <section>
@@ -69,7 +69,11 @@
 const $ = s => document.querySelector(s);
 const short = (k, n = 6) => k ? k.slice(0, n) + '…' + k.slice(-4) : '';
 const SOL = 'So11111111111111111111111111111111111111112';
-const sol = (v, mint) => (typeof v !== 'number') ? '-' : (!mint || mint === SOL) ? (v / 1e9).toFixed(3) : (v >= 1e6 ? v.toExponential(2) : String(v));
+// Known quote mints: symbol + decimals. Anything else is shown raw (unknown decimals) next to its shortened mint.
+const QUOTES = { [SOL]: ['SOL', 9], 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v': ['USDC', 6], 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB': ['USDT', 6] };
+const qinfo = mint => QUOTES[mint || SOL];
+const sol = (v, mint) => { if (typeof v !== 'number') return '-'; const q = qinfo(mint); if (q) return (v / 10 ** q[1]).toFixed(q[1] === 9 ? 3 : 2); return v >= 1e6 ? v.toExponential(2) : String(v); };
+const qlabel = mint => { const q = qinfo(mint); return q ? q[0] : short(mint, 4); };
 const pct = (v, d = 2) => (typeof v === 'number') ? v.toFixed(d) : '-';
 const cls = v => (typeof v === 'number') ? (v > 0 ? 'pos' : v < 0 ? 'neg' : '') : '';
 const num = (v, d = 2) => (typeof v === 'number') ? v.toFixed(d) : '-';
@@ -90,7 +94,7 @@ function renderHealth(h) {
 function renderPools(rows) {
   $('#pools tbody').innerHTML = rows.slice(0, 25).map(p => `<tr><td class="mono">${short(p.pool)}${p.is_curve_complete ? ' ✓' : ''}</td>
     <td><div class="bar"><i style="width:${Math.min(100, p.progress_pct)}%"></i><b>${pct(p.progress_pct, 1)}%</b></div></td>
-    <td>${sol(p.quote_reserve, p.quote_mint)}</td><td class="pos">${sol(p.buy_quote, p.quote_mint)}</td><td class="neg">${sol(p.sell_quote, p.quote_mint)}</td><td>${sol(p.trading_quote_fee, p.quote_mint)}</td><td class="mono">${(!p.quote_mint || p.quote_mint === SOL) ? 'SOL' : short(p.quote_mint, 4)}</td><td class="mono">${short(p.config, 4)}</td></tr>`).join('');
+    <td>${sol(p.quote_reserve, p.quote_mint)}</td><td class="pos">${sol(p.buy_quote, p.quote_mint)}</td><td class="neg">${sol(p.sell_quote, p.quote_mint)}</td><td>${sol(p.trading_quote_fee, p.quote_mint)}</td><td class="mono">${qlabel(p.quote_mint)}</td><td class="mono">${short(p.config, 4)}</td></tr>`).join('');
 }
 function renderDamm(rows) {
   $('#damm tbody').innerHTML = rows.slice(0, 25).map(d => `<tr><td class="mono">${short(d.pool)}</td><td>${num(d.hours, 2)}</td><td>${num(d.hours_since_migration, 2)}</td>

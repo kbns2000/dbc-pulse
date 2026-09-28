@@ -28,6 +28,39 @@ def test_blur_handle_counts_and_agreement():
     tap.handle({"type": "metadata", "mint": "M"}, now=now)            # ignored
     h = tap.health()
     assert h["events"] == 2 and h["by_type"] == {"swap": 1, "liquidity": 1} and h["dex_seen"] == {"meteora-dbc": 1}
-    assert h["reserve_agreement"] == 1.0 and h["agree_n"] == 1 and h["liquidity_remove"] == 1 and 400 <= h["lag_ms_avg"] <= 1100
-    tap.handle({"type": "swap", "pool": "POOL1", "quote_reserve": 2_000_000_000, "block_time": now}, now=now)   # 50% off → disagreement
-    assert tap.health()["reserve_agreement"] == 0.5
+    assert h["agree_n"] == 0 and h["liquidity_remove"] == 1 and 400 <= h["lag_ms_avg"] <= 1100   # not yet quiet: no comparison
+    tap._settle(now + 10); assert tap.health()["reserve_agreement"] == 1.0 and tap.health()["agree_n"] == 1
+    tap.handle({"type": "swap", "pool": "POOL1", "quote_reserve": 2_000_000_000, "block_time": now + 20}, now=now + 20)   # 50% off
+    tap._settle(now + 30); assert tap.health()["reserve_agreement"] == 0.5
+
+
+def test_blur_keeps_provider_wallet_and_exact_agreement():
+    ours = {"P": 589_751_510}   # reserve + unclaimed fees = vault balance (Blur's definition)
+    tap = BlurTap("K", lambda: ["P"], reserve_fn=lambda p: ours.get(p)); now = 1_000_000.0
+    liq = {"type": "liquidity", "kind": "add", "pool": "P", "provider": "WALLET1", "quote_usd": 12.5, "indexed_at": now - 0.2, "block_time": now - 1}
+    row = tap.handle(liq, now=now)
+    assert row["provider"] == "WALLET1" and row["quote_usd"] == 12.5 and row["indexed_at"] == now - 0.2
+    tap.handle({"type": "swap", "pool": "P", "quote_reserve": 589_751_510, "block_time": now}, now=now)
+    tap._settle(now + 9); h = tap.health(); assert h["agree_exact"] == 1 and h["reserve_agreement"] == 1.0
+
+
+def test_quiet_window_needs_later_poll():
+    polls = {"P": (100, 1_000.0)}                     # our last poll BEFORE the Blur swap
+    tap = BlurTap("K", lambda: ["P"], reserve_fn=lambda p: polls.get(p))
+    tap.handle({"type": "swap", "pool": "P", "quote_reserve": 105, "block_time": 1_005.0}, now=1_005.5)
+    tap.handle({"type": "swap", "pool": "P", "quote_reserve": 110, "block_time": 1_006.0}, now=1_006.5)   # replaces the older one
+    tap._settle(1_020.0); assert tap.health()["agree_n"] == 0            # stale poll: wait
+    polls["P"] = (110, 1_016.0); tap._settle(1_021.0)
+    h = tap.health(); assert h["agree_n"] == 1 and h["agree_exact"] == 1
+
+
+def test_poll_keys_cover_busy_and_rotate():
+    from dbc_pulse.stream import Stream
+    st = Stream.__new__(Stream)
+    class U: pass
+    st.uni = U(); st.uni.pools = {f"P{i}": {"first_seen": i, "last_activity": None} for i in range(1500)}
+    st.uni.pools["P1499"]["last_activity"] = 10_000   # newest + busiest pool, last in insertion order
+    seen = set()
+    for _ in range(4):
+        ks = st._poll_keys(); assert len(ks) == 1000 and "P1499" in ks; seen |= set(ks)
+    assert len(seen) == 1500   # every pool read within a few cycles
