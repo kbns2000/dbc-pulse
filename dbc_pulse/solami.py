@@ -36,10 +36,19 @@ def solami_urls(key: str) -> dict:
             "blur": f"wss://ws.solami.dev/data/subscribe?chain=solana&api_key={key}"}
 
 
+def solami_active() -> bool:
+    """False after DBC_SOLAMI_UNTIL (ISO time, default 2026-10-05T00:00:00+09:00 = before the Pro trial ends; the Free plan has
+    no WebSocket) or when data/solami_off.flag exists. Lets the stream fall back to SOLANA_RPC_URL without anyone editing .env."""
+    if (DATA / "solami_off.flag").exists(): return False
+    from datetime import datetime
+    try: return time.time() < datetime.fromisoformat(os.environ.get("DBC_SOLAMI_UNTIL", "2026-10-05T00:00:00+09:00")).timestamp()
+    except ValueError: return True
+
+
 def provider_urls() -> tuple[str, str, str]:
-    """(rpc_url, ws_url, provider_name). Solami when DBC_PROVIDER=solami and a key is set, else SOLANA_RPC_URL."""
+    """(rpc_url, ws_url, provider_name). Solami when DBC_PROVIDER=solami, a key is set and solami_active(), else SOLANA_RPC_URL."""
     key = solami_key()
-    if key and (os.environ.get("DBC_PROVIDER", "").lower() == "solami"):
+    if key and (os.environ.get("DBC_PROVIDER", "").lower() == "solami") and solami_active():
         u = solami_urls(key); return u["rpc"], u["ws"], "solami"
     url = os.environ.get("SOLANA_RPC_URL") or ""
     return url, url.replace("https://", "wss://", 1), "custom"

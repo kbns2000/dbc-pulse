@@ -16,7 +16,9 @@ def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--rps", type=float, default=4); ap.add_argument("--kinds", default="migration,lifecycle"); a = ap.parse_args()
     load_env(); rpc = Rpc(provider_urls()[0], rps=a.rps); cache = {}
     for kind in a.kinds.split(","):
+        today = __import__("time").strftime("%Y%m%d", __import__("time").gmtime())
         for f in sorted(glob.glob(str(DATA / f"{kind}_*.jsonl"))):
+            if today in Path(f).name: print(f"{Path(f).name}: skipped (current UTC day, still being written)"); continue
             lines = open(f, encoding="utf-8").read().splitlines(); rows = []; changed = 0
             for line in lines:
                 try: r = json.loads(line)

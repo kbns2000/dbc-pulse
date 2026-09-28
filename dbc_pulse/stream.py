@@ -21,7 +21,7 @@ import requests, websockets
 from .idl_decoder import IdlDecoder
 from .collector import Rpc, decode_tx, load_env, DBC_PROGRAM, DATA
 from .damm import decode_migrations, DammDecoder, LpTracker
-from .solami import provider_urls, solami_key, BlurTap
+from .solami import provider_urls, solami_key, solami_active, BlurTap
 
 ROOT = Path(__file__).resolve().parent.parent
 HB = DATA / "stream_heartbeat.json"; LIVE = DATA / "pools_live.json"; DAMM_LIVE = DATA / "damm_live.json"
@@ -214,6 +214,8 @@ class Stream:
     async def status_loop(self):
         while True:
             await asyncio.sleep(60); c = self.counts
+            if self.provider == "solami" and not solami_active():   # trial window over: exit, the scheduled task restarts us on SOLANA_RPC_URL
+                print("solami window ended - exiting for restart on fallback provider", flush=True); os._exit(0)
             print(f"{time.strftime('%H:%M:%S')} logs {c['logs']} swaps {c['swaps']} lifecycle-events {c['lifecycle']} fetched {c['fetched']} sampled {c['sampled']} errors {c['errors']} · pools {len(self.uni.pools)} configs {len(self.uni.configs)} · migrations {c['migrations']} damm-tracked {len(self.damm)}", flush=True)
 
     def _block_time(self, slot) -> int:
@@ -257,7 +259,7 @@ class Stream:
     async def run(self):
         tasks = [self.ws_loop(), self.fetch_loop(), self.poll_loop(), self.damm_loop(), self.status_loop()]
         key = solami_key()
-        if key and os.environ.get("DBC_BLUR", "1") != "0":
+        if key and os.environ.get("DBC_BLUR", "1") != "0" and solami_active():
             self.blur = BlurTap(key, self._blur_pools, self._our_quote_reserve); self.blur.activity_fn = self._mark_active; tasks.append(self.blur.run())
         await asyncio.gather(*tasks)
 

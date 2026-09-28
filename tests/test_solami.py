@@ -10,7 +10,7 @@ def test_provider_switch(monkeypatch):
     monkeypatch.delenv("SOLAMI_API_KEY", raising=False); monkeypatch.delenv("DBC_PROVIDER", raising=False)
     rpc, ws, name = provider_urls()
     assert name == "custom" and rpc.startswith("https://example-rpc") and ws.startswith("wss://example-rpc")
-    monkeypatch.setenv("SOLAMI_API_KEY", "TESTKEY"); monkeypatch.setenv("DBC_PROVIDER", "solami")
+    monkeypatch.setenv("SOLAMI_API_KEY", "TESTKEY"); monkeypatch.setenv("DBC_PROVIDER", "solami"); monkeypatch.setenv("DBC_SOLAMI_UNTIL", "2099-01-01T00:00:00+00:00")
     rpc, ws, name = provider_urls()
     assert name == "solami" and rpc == "https://rpc.solami.dev/sol?api_key=TESTKEY" and ws == "wss://ws.solami.dev/ws/sol?api_key=TESTKEY"
     assert solami_urls("K")["blur"] == "wss://ws.solami.dev/data/subscribe?chain=solana&api_key=K"
@@ -80,3 +80,9 @@ def test_slot_order_required_when_known():
     tap._settle(1_020.0); assert tap.health()["agree_n"] == 0
     polls["P"] = (110, 5_001.0, None, 100); tap._settle(1_021.0)
     h = tap.health(); assert h["agree_n"] == 1 and h["agree_exact"] == 1
+
+
+def test_solami_window_falls_back(monkeypatch):
+    monkeypatch.setenv("SOLANA_RPC_URL", "https://example-rpc.invalid/?k=1"); monkeypatch.setenv("SOLAMI_API_KEY", "TESTKEY"); monkeypatch.setenv("DBC_PROVIDER", "solami")
+    monkeypatch.setenv("DBC_SOLAMI_UNTIL", "2000-01-01T00:00:00+00:00")
+    assert provider_urls()[2] == "custom"
