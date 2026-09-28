@@ -34,6 +34,20 @@ Budget: one WebSocket plus roughly 1–2 HTTP calls/s regardless of chain volume
 - DAMM v2, first ~1.5 h after migration (clean pools with a price move, n=203): measured LVR / (σ²/8) = 0.92 median (p10 0.75, p90 1.04); fees cover 1.3% of LVR (median); 203/203 pools net negative for LPs; median price −12%. Pools with a >10× price move or a >50% liquidity pull inside one poll (25% of tracked) are flagged and excluded from aggregates.
 - Fee ladder from `PoolConfig`: protocol 20% of trading fee → remainder split between partner (config owner) and creator (`creator_trading_fee_percentage`); partner also receives locked/unlocked LP at migration, migration fee (0–10%) and surplus. Across 319 tracked young pools: 129.6 SOL lifetime trading fees, top 3 partner wallets 66.7%, median config 0.001 SOL.
 
+## Running on Solami (RPC + WebSocket + Blur)
+dbc-pulse can run entirely on [Solami](https://solami.dev) and adds Solami **Blur** (decoded market data) as a second, independent feed next to its own IDL decoder.
+
+| env (dbc_pulse/.env) | effect |
+|---|---|
+| `SOLAMI_API_KEY` | your key — `python scripts/set_solami_key.py` stores it without echoing |
+| `DBC_PROVIDER=solami` | RPC `https://rpc.solami.dev/sol` and WebSocket `wss://ws.solami.dev/ws/sol` for the whole stream |
+| `DBC_BLUR=0` | disable the Blur tap (on by default when a key is set; needs the DataApi permission) |
+
+The Blur tap subscribes to `swap`, `liquidity`, `pool_create`, `graduation` and `meme` events **for exactly the pools dbc-pulse tracks** (filter refreshed every 60 s as pools migrate), writes `data/blur_*.jsonl`, and reports in the heartbeat / `data/blur_health.json`:
+- liquidity adds/removes per DAMM v2 pool with the provider wallet (liquidity movement in/out),
+- event lag (receive time − block time) and events per type (stream health),
+- reserve agreement: Blur's quote reserve vs our polled VirtualPool reserve for the same pool (decoder cross-check).
+
 ## API and dashboard
 `python -m dbc_pulse.api` reads only the files the stream writes (no RPC) and serves:
 

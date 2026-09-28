@@ -21,6 +21,7 @@ import requests, websockets
 from .idl_decoder import IdlDecoder
 from .collector import Rpc, decode_tx, load_env, DBC_PROGRAM, DATA
 from .damm import decode_migrations, DammDecoder, LpTracker
+from .solami import provider_urls, solami_key, BlurTap
 
 ROOT = Path(__file__).resolve().parent.parent
 HB = DATA / "stream_heartbeat.json"; LIVE = DATA / "pools_live.json"; DAMM_LIVE = DATA / "damm_live.json"
@@ -64,9 +65,9 @@ class PoolUniverse:
 
 class Stream:
     def __init__(self):
-        load_env(); url = os.environ.get("SOLANA_RPC_URL")
-        if not url: raise SystemExit("SOLANA_RPC_URL not set (.env)")
-        self.rpc = Rpc(url, rps=float(os.environ.get("DBC_RPS", "4"))); self.ws_url = url.replace("https://", "wss://", 1)
+        load_env(); url, ws_url, self.provider = provider_urls()
+        if not url: raise SystemExit("SOLANA_RPC_URL not set (.env) — or set SOLAMI_API_KEY + DBC_PROVIDER=solami")
+        self.rpc = Rpc(url, rps=float(os.environ.get("DBC_RPS", "4"))); self.ws_url = ws_url
         self.dec = IdlDecoder(ROOT / "dbc_pulse" / "idl" / "dbc.json"); self.uni = PoolUniverse()
         self.damm_dec = DammDecoder(ROOT / "dbc_pulse" / "idl" / "damm_v2.json"); self.damm: dict[str, LpTracker] = {}; self._seed_damm()
         self.counts = {"logs": 0, "swaps": 0, "lifecycle": 0, "fetched": 0, "sampled": 0, "migrations": 0, "dropped": 0, "errors": 0}; self.swap_seen = 0; self.pending: list[tuple[str, str]] = []; self.retry: list[tuple[float, str, str]] = []
@@ -171,7 +172,7 @@ class Stream:
             _jsonl("state", [s for s in snaps if s["dq"] or s["migrated"]]); self.uni.prune()
             try:
                 LIVE.write_text(json.dumps(self.uni.pools, ensure_ascii=False), encoding="utf-8")
-                HB.write_text(json.dumps(dict(ts=time.time(), pid=os.getpid(), pools=len(self.uni.pools), configs=len(self.uni.configs), damm=len(self.damm), **self.counts)), encoding="utf-8")
+                HB.write_text(json.dumps(dict(ts=time.time(), pid=os.getpid(), provider=self.provider, pools=len(self.uni.pools), configs=len(self.uni.configs), damm=len(self.damm), blur=(self.blur.health() if getattr(self, "blur", None) else None), **self.counts)), encoding="utf-8")
             except Exception: pass
             await asyncio.sleep(max(0.5, POLL_S - (time.time() - t0)))
 
@@ -205,8 +206,22 @@ class Stream:
             await asyncio.sleep(60); c = self.counts
             print(f"{time.strftime('%H:%M:%S')} logs {c['logs']} swaps {c['swaps']} lifecycle-events {c['lifecycle']} fetched {c['fetched']} sampled {c['sampled']} errors {c['errors']} · pools {len(self.uni.pools)} configs {len(self.uni.configs)} · migrations {c['migrations']} damm-tracked {len(self.damm)}", flush=True)
 
+    def _blur_pools(self):
+        return list(self.uni.pools) + list(self.damm)
+
+    def _our_quote_reserve(self, pool):
+        p = self.uni.pools.get(pool)
+        if p and p.get("quote_reserve"): return p["quote_reserve"]
+        tr = self.damm.get(pool)
+        if tr and tr.prev: return None   # DAMM reserves are per-unit in the tracker; agreement check uses DBC curves only
+        return None
+
     async def run(self):
-        await asyncio.gather(self.ws_loop(), self.fetch_loop(), self.poll_loop(), self.damm_loop(), self.status_loop())
+        tasks = [self.ws_loop(), self.fetch_loop(), self.poll_loop(), self.damm_loop(), self.status_loop()]
+        key = solami_key()
+        if key and os.environ.get("DBC_BLUR", "1") != "0":
+            self.blur = BlurTap(key, self._blur_pools, self._our_quote_reserve); tasks.append(self.blur.run())
+        await asyncio.gather(*tasks)
 
 
 def _pid_alive(pid: int) -> bool:
