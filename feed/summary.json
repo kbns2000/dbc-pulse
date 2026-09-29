@@ -1,19 +1,19 @@
 {
- "updated_utc": "2026-09-29T00:54:01Z",
+ "updated_utc": "2026-09-29T01:54:01Z",
  "stream_alive": true,
  "provider": "solami",
- "curves_tracked": 1410,
- "configs_seen": 1150,
- "damm_pools_tracked": 3154,
- "migrations_seen": 130,
+ "curves_tracked": 1526,
+ "configs_seen": 1248,
+ "damm_pools_tracked": 3265,
+ "migrations_seen": 241,
  "rpc_errors": 0,
  "graduation_take_flags": 11,
  "blur": {
-  "events": 219753,
-  "lag_ms_avg": 2117.8,
-  "compared": 668,
-  "identical": 633,
-  "within_2pct": 0.9835
+  "events": 482830,
+  "lag_ms_avg": 2099.6,
+  "compared": 1391,
+  "identical": 1328,
+  "within_2pct": 0.9792
  },
  "source": "https://github.com/kbns2000/dbc-pulse"
 }
