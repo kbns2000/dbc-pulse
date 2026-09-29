@@ -1,5 +1,5 @@
 {
- "updated_utc": "2026-09-29T07:54:01Z",
+ "updated_utc": "2026-09-29T08:54:01Z",
  "threshold_pct": 20,
  "curves": [
   {
@@ -30,24 +30,6 @@
    "graduation_take_creator_pct": 100
   },
   {
-   "pool": "4rzpARMdftww9Xbze9Cmrc1sRAEAW7kfvXNzaNxz9gyh",
-   "base_mint": "DMfBRfC7BB4zb4NKz7aph2vtpCtMs9mg1APWD8hb3TLW",
-   "config": "9wqf54aEP1xoX6jG4PpHnZQE9FP9tDvrEB2CePtQhgB3",
-   "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 0.0,
-   "graduation_take_pct": 99,
-   "graduation_take_creator_pct": 0
-  },
-  {
-   "pool": "9VDXSSvxAtpuam6fjJWs9u5c1G985E2eSc8HbXNkhxZ5",
-   "base_mint": "5TPnCxaPboTQLSof5PTELHqpihvsNLL8bw4ikDTFRvAc",
-   "config": "EHsN1LsU3KCyyqrspyhx38UnrkYXxAcaRyANmfNCPj6W",
-   "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 0.0,
-   "graduation_take_pct": 99,
-   "graduation_take_creator_pct": 0
-  },
-  {
    "pool": "9rZcomdXvehJ44T7y1Hjgjomov6kzNAHxxZe3yNHWfsR",
    "base_mint": "6WmviExqoR3Qr22HcM943xa4SS7Bs4SVbNmNYBLstTGQ",
    "config": "F6yEM7VdhMxPko3fV3PhZFw8R7q9bp1tgZTnQKaWL3hD",
@@ -59,24 +41,6 @@
   {
    "pool": "AcjVS4u1jPiLeGVqZjbyr8nFYG4wAkhc4xLdJjH1Mxu7",
    "base_mint": "8s6dkkPtcNDNJNHkvs7RSjGua3rmXqcj9Gj2uFVsN8Pb",
-   "config": "3BAyShp6AnNDUh2ibWC2mTHszZ96ykH4hmeghybSeCpW",
-   "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 0.0,
-   "graduation_take_pct": 99,
-   "graduation_take_creator_pct": 100
-  },
-  {
-   "pool": "H7hsnDTYN21CiRefSttpA9X2C24LKbx4P7V2rEb1Xgf",
-   "base_mint": "6dWpVjtkJBJDMMMFAivdUs5TD6BQCeUv7iENkPGohsay",
-   "config": "3BAyShp6AnNDUh2ibWC2mTHszZ96ykH4hmeghybSeCpW",
-   "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 0.0,
-   "graduation_take_pct": 99,
-   "graduation_take_creator_pct": 100
-  },
-  {
-   "pool": "GPiSgYgjtsF1nviVVEcrhkovLHky1v51V2LUyWcDVmCz",
-   "base_mint": "3RQsxdA2BFVLcWykDM5sBFRZewWHMHpNXTHfNo6pWm9X",
    "config": "3BAyShp6AnNDUh2ibWC2mTHszZ96ykH4hmeghybSeCpW",
    "quote_mint": "So11111111111111111111111111111111111111112",
    "progress_pct": 0.0,
