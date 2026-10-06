@@ -1,9 +1,9 @@
 {
- "updated_utc": "2026-10-06T00:54:01Z",
+ "updated_utc": "2026-10-06T00:55:29Z",
  "configs": [
   {
    "config": "unknown",
-   "pools": 116,
+   "pools": 117,
    "curve_complete": 0,
    "migrated": 0,
    "launches": 0,
@@ -470,6 +470,19 @@
    "graduation_take_creator_pct": 100
   },
   {
+   "config": "FFuuoH7pAfBz97Eig1WeJQgqjKsqw9Bw3APhZWMv7rav",
+   "pools": 3,
+   "curve_complete": 0,
+   "migrated": 0,
+   "launches": null,
+   "completion_rate": null,
+   "instant_share": null,
+   "median_minutes_to_complete": null,
+   "median_swaps": null,
+   "graduation_take_pct": 99,
+   "graduation_take_creator_pct": 100
+  },
+  {
    "config": "4DkbzLZ58ZA477p9Aw4BzvxTNwP8sma94Sd1bfqcNw3J",
    "pools": 2,
    "curve_complete": 0,
@@ -835,19 +848,6 @@
   },
   {
    "config": "3DiuS7e99QyZBHDrNaPdpavQ9s89wC6rinYKjXKimjpU",
-   "pools": 2,
-   "curve_complete": 0,
-   "migrated": 0,
-   "launches": null,
-   "completion_rate": null,
-   "instant_share": null,
-   "median_minutes_to_complete": null,
-   "median_swaps": null,
-   "graduation_take_pct": 99,
-   "graduation_take_creator_pct": 100
-  },
-  {
-   "config": "FFuuoH7pAfBz97Eig1WeJQgqjKsqw9Bw3APhZWMv7rav",
    "pools": 2,
    "curve_complete": 0,
    "migrated": 0,
@@ -2158,45 +2158,6 @@
    "median_swaps": null,
    "graduation_take_pct": 99,
    "graduation_take_creator_pct": 100
-  },
-  {
-   "config": "Do936ggXac9cPDkZobCJdbmaQZreNDmUdCr6Zu3m9NRY",
-   "pools": 1,
-   "curve_complete": 0,
-   "migrated": 0,
-   "launches": null,
-   "completion_rate": null,
-   "instant_share": null,
-   "median_minutes_to_complete": null,
-   "median_swaps": null,
-   "graduation_take_pct": 0,
-   "graduation_take_creator_pct": 0
-  },
-  {
-   "config": "A7ZjVUcYLzAk1zRUyvh5kfXpXaH3bq7rHeoAuGww7YFe",
-   "pools": 1,
-   "curve_complete": 0,
-   "migrated": 0,
-   "launches": null,
-   "completion_rate": null,
-   "instant_share": null,
-   "median_minutes_to_complete": null,
-   "median_swaps": null,
-   "graduation_take_pct": 0,
-   "graduation_take_creator_pct": 0
-  },
-  {
-   "config": "A5tFdouCNQNFwdeRNuNrWYYYjoNxYXfeCg7zu421aJAz",
-   "pools": 1,
-   "curve_complete": 0,
-   "migrated": 0,
-   "launches": null,
-   "completion_rate": null,
-   "instant_share": null,
-   "median_minutes_to_complete": null,
-   "median_swaps": null,
-   "graduation_take_pct": 0,
-   "graduation_take_creator_pct": 0
   },
   {
    "config": "6KwQ9sd5144LgbosSbjc9ajx84UictaWPFxZNsMUox8F",
