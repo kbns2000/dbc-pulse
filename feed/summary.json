@@ -1,13 +1,13 @@
 {
- "updated_utc": "2026-10-07T18:54:01Z",
+ "updated_utc": "2026-10-07T19:54:01Z",
  "stream_alive": true,
  "provider": "fallback:solami-rpc+public-ws",
- "curves_tracked": 501,
- "configs_seen": 107,
- "damm_pools_tracked": 7115,
- "migrations_seen": 1697,
+ "curves_tracked": 489,
+ "configs_seen": 112,
+ "damm_pools_tracked": 7149,
+ "migrations_seen": 1731,
  "rpc_errors": 0,
- "graduation_take_flags": 14,
+ "graduation_take_flags": 15,
  "blur": null,
  "source": "https://github.com/kbns2000/dbc-pulse"
 }
