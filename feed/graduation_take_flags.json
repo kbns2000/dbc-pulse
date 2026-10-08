@@ -1,5 +1,5 @@
 {
- "updated_utc": "2026-10-07T23:54:01Z",
+ "updated_utc": "2026-10-08T00:50:13Z",
  "threshold_pct": 20,
  "curves": [
   {
@@ -7,7 +7,7 @@
    "base_mint": "6VJnmXSHkC7awLNqb684Metaxmj662noqH83CWCn8zih",
    "config": "6GdLrNUhNWe2vqp3Hr75pcfMzzc65qruPjRoCERDeHAy",
    "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 19.783,
+   "progress_pct": 21.839,
    "graduation_take_pct": 22,
    "graduation_take_creator_pct": 90
   },
@@ -96,6 +96,24 @@
    "pool": "3abbbGA8xK1FwtkJsZVrsbv6d6dKYjUX63DAXMW7G759",
    "base_mint": "BPxiv3KuLHx3W8hmRoFG6Wx53DWthjXv3TAmwRsaCyJJ",
    "config": "5YMkVepxtu3S4RZeZUgGjWWzjbV9zTZUhvxdQjwhicKC",
+   "quote_mint": "So11111111111111111111111111111111111111112",
+   "progress_pct": 0.0,
+   "graduation_take_pct": 99,
+   "graduation_take_creator_pct": 100
+  },
+  {
+   "pool": "CLZozgUnAUkgVsyCHFMpMoVFeV2RMCEsJfjHM8dDHcxh",
+   "base_mint": "3acCYgu7nF7qY68xUZ81VaCxYicQSkAmYprDMfW3myxz",
+   "config": "6THaSTuvF3o45DVLPW5DtvwcLjdtW6Nt3MFGR4kUdD3L",
+   "quote_mint": "So11111111111111111111111111111111111111112",
+   "progress_pct": 0.0,
+   "graduation_take_pct": 50,
+   "graduation_take_creator_pct": 100
+  },
+  {
+   "pool": "8bagJNjwawS6wMacEpSTfXjP7P2aJZoBBTZnG84xDB27",
+   "base_mint": "8AQFUZRg6Bx6FsdNzBWramE1VZzfCTLcGnAYLuG416vF",
+   "config": "6NNKdJmmz8fyDEowHQdMBtYhSNjnQUi3kmfSLp2QgY8z",
    "quote_mint": "So11111111111111111111111111111111111111112",
    "progress_pct": 0.0,
    "graduation_take_pct": 99,
