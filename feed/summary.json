@@ -1,8 +1,8 @@
 {
- "updated_utc": "2026-10-08T00:50:13Z",
+ "updated_utc": "2026-10-08T00:54:01Z",
  "stream_alive": true,
  "provider": "fallback:solami-rpc+public-ws",
- "curves_tracked": 676,
+ "curves_tracked": 678,
  "configs_seen": 95,
  "damm_pools_tracked": 7355,
  "migrations_seen": 1937,
