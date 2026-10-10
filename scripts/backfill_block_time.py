@@ -9,12 +9,12 @@ import argparse, glob, json, shutil, sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from dbc_pulse.collector import Rpc, load_env, DATA
-from dbc_pulse.solami import provider_urls
+from dbc_pulse.solami import working_urls
 
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--rps", type=float, default=4); ap.add_argument("--kinds", default="migration,lifecycle"); a = ap.parse_args()
-    load_env(); rpc = Rpc(provider_urls()[0], rps=a.rps); cache = {}
+    load_env(); rpc = Rpc(working_urls()[0], rps=a.rps); cache = {}   # checked endpoint (falls back when the configured one does not answer)
     for kind in a.kinds.split(","):
         today = __import__("time").strftime("%Y%m%d", __import__("time").gmtime())
         for f in sorted(glob.glob(str(DATA / f"{kind}_*.jsonl"))):

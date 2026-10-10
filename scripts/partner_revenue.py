@@ -17,7 +17,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from dbc_pulse.collector import Rpc, load_env, DATA
 from dbc_pulse.idl_decoder import IdlDecoder
 from dbc_pulse.damm import DammDecoder, orient, Q64
-from dbc_pulse.solami import provider_urls
+from dbc_pulse.solami import working_urls
 
 ROOT = Path(__file__).resolve().parent.parent; SOL = "So11111111111111111111111111111111111111112"; PROTOCOL_SHARE = 0.20
 POS_DISC = bytes([170, 188, 143, 228, 122, 64, 247, 208])
@@ -38,7 +38,7 @@ def fetch(rpc, keys):
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--rps", type=float, default=4); a = ap.parse_args()
-    load_env(); url, _, provider = provider_urls(); rpc = Rpc(url, rps=a.rps)
+    load_env(); url, _, provider = working_urls(); rpc = Rpc(url, rps=a.rps)   # checked endpoint (falls back when the configured one does not answer)
     dbc = IdlDecoder(ROOT / "dbc_pulse" / "idl" / "dbc.json"); dd = DammDecoder(ROOT / "dbc_pulse" / "idl" / "damm_v2.json")
     migs = {}
     for f in sorted(glob.glob(str(DATA / "migration_*.jsonl"))):
