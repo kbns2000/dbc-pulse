@@ -23,6 +23,8 @@ dbc-pulse instead uses three cheap channels (`dbc_pulse/stream.py`):
 4. **DAMM v2 follow-through** — `migration_damm_v2` transactions are decoded from their account list (no DBC event carries the DAMM pool), and the resulting DAMM v2 `Pool` accounts are polled every 10s. Per unit of liquidity the tracker accumulates fees (from `fee_*_per_liquidity` growth) and LVR (hold-the-previous-composition vs. stay-in-pool, summed over polls), reports net realized yield, annualized σ and the σ²/8 theory line (`dbc_pulse/damm.py`).
 Budget: one WebSocket plus roughly 1–2 HTTP calls/s regardless of chain volume. A heartbeat file makes the stream single-instance.
 
+Endpoint check: at start the stream asks the configured RPC for `getSlot`. If it does not answer (quota used up, outage), the stream falls back — to the Solami RPC when a key is set and it answers, otherwise to public mainnet-beta, with the public WebSocket in both cases — and reports `provider: fallback:…` in `feed/summary.json`. Once an hour it checks again and exits when the configured endpoint answers, so whatever supervises it (scheduled task, systemd) restarts it there. `DBC_NO_FALLBACK=1` switches this off; an unset `SOLANA_RPC_URL` is still reported as an error (`dbc_pulse/solami.py: working_urls`).
+
 ## Status
 - [x] Event collector (RPC signatures → transactions → event-CPI decode) — `python -m dbc_pulse.collector --backfill N` (batch) / v2 live stream `python -m dbc_pulse.stream`
 - [x] Pool state tracker (curve progress, thresholds, buy/sell pressure, per-config completion & instant-launch share) — `python -m dbc_pulse.pool_tracker`

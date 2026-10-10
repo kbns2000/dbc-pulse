@@ -21,7 +21,7 @@ import requests, websockets
 from .idl_decoder import IdlDecoder
 from .collector import Rpc, decode_tx, load_env, DBC_PROGRAM, DATA
 from .damm import decode_migrations, DammDecoder, LpTracker
-from .solami import provider_urls, solami_key, solami_active, BlurTap
+from .solami import provider_urls, working_urls, solami_key, solami_active, BlurTap
 
 ROOT = Path(__file__).resolve().parent.parent
 HB = DATA / "stream_heartbeat.json"; LIVE = DATA / "pools_live.json"; DAMM_LIVE = DATA / "damm_live.json"
@@ -65,7 +65,7 @@ class PoolUniverse:
 
 class Stream:
     def __init__(self):
-        load_env(); url, ws_url, self.provider = provider_urls()
+        load_env(); url, ws_url, self.provider = working_urls()   # checked: falls back when the configured endpoint does not answer
         if not url: raise SystemExit("SOLANA_RPC_URL not set (.env) — or set SOLAMI_API_KEY + DBC_PROVIDER=solami")
         self.rpc = Rpc(url, rps=float(os.environ.get("DBC_RPS", "4"))); self.ws_url = ws_url
         self.dec = IdlDecoder(ROOT / "dbc_pulse" / "idl" / "dbc.json"); self.uni = PoolUniverse()
@@ -216,6 +216,10 @@ class Stream:
             await asyncio.sleep(60); c = self.counts
             if self.provider == "solami" and not solami_active():   # trial window over: exit, the scheduled task restarts us on SOLANA_RPC_URL
                 print("solami window ended - exiting for restart on fallback provider", flush=True); os._exit(0)
+            self._ticks = getattr(self, "_ticks", 0) + 1
+            if self.provider.startswith("fallback") and self._ticks % 60 == 0 and provider_urls()[2] == "custom":   # hourly: configured endpoint back? exit, the scheduled task restarts us on it
+                from .solami import _rpc_ok
+                if _rpc_ok(provider_urls()[0]): print("configured endpoint answers again - exiting for restart on it", flush=True); os._exit(0)
             print(f"{time.strftime('%H:%M:%S')} logs {c['logs']} swaps {c['swaps']} lifecycle-events {c['lifecycle']} fetched {c['fetched']} sampled {c['sampled']} errors {c['errors']} · pools {len(self.uni.pools)} configs {len(self.uni.configs)} · migrations {c['migrations']} damm-tracked {len(self.damm)}", flush=True)
 
     def _block_time(self, slot) -> int:

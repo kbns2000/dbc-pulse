@@ -86,3 +86,22 @@ def test_solami_window_falls_back(monkeypatch):
     monkeypatch.setenv("SOLANA_RPC_URL", "https://example-rpc.invalid/?k=1"); monkeypatch.setenv("SOLAMI_API_KEY", "TESTKEY"); monkeypatch.setenv("DBC_PROVIDER", "solami")
     monkeypatch.setenv("DBC_SOLAMI_UNTIL", "2000-01-01T00:00:00+00:00")
     assert provider_urls()[2] == "custom"
+
+
+def test_working_urls_checks_the_endpoint_and_falls_back(monkeypatch):
+    import dbc_pulse.solami as s
+    monkeypatch.setenv("SOLANA_RPC_URL", "https://example-rpc.invalid/?k=1")
+    monkeypatch.delenv("SOLAMI_API_KEY", raising=False); monkeypatch.delenv("DBC_PROVIDER", raising=False); monkeypatch.delenv("DBC_NO_FALLBACK", raising=False)
+    asked = []
+    monkeypatch.setattr(s, "_rpc_ok", lambda url, timeout=8.0: asked.append(url) or True)
+    assert s.working_urls() == s.provider_urls() and asked == ["https://example-rpc.invalid/?k=1"]      # answers: used as configured
+    monkeypatch.setattr(s, "_rpc_ok", lambda url, timeout=8.0: False)
+    assert s.working_urls() == (s.PUBLIC_RPC, s.PUBLIC_WS, "fallback:public")                            # silent endpoint, no Solami key
+    monkeypatch.setenv("SOLAMI_API_KEY", "TESTKEY")
+    monkeypatch.setattr(s, "_rpc_ok", lambda url, timeout=8.0: "solami" in url)
+    assert s.working_urls() == ("https://rpc.solami.dev/sol?api_key=TESTKEY", s.PUBLIC_WS, "fallback:solami-rpc+public-ws")
+    monkeypatch.setenv("DBC_NO_FALLBACK", "1")
+    assert s.working_urls()[2] == "custom"                                                                # fallback switched off
+    monkeypatch.delenv("DBC_NO_FALLBACK"); monkeypatch.delenv("SOLANA_RPC_URL")
+    monkeypatch.setattr(s, "_rpc_ok", lambda url, timeout=8.0: True)
+    assert s.working_urls()[0] == ""                                                                      # unset stays unset: the caller reports it

@@ -54,6 +54,34 @@ def provider_urls() -> tuple[str, str, str]:
     return url, url.replace("https://", "wss://", 1), "custom"
 
 
+PUBLIC_RPC = "https://api.mainnet-beta.solana.com"; PUBLIC_WS = "wss://api.mainnet-beta.solana.com"
+
+
+def _rpc_ok(url: str, timeout: float = 8.0) -> bool:
+    """True when the endpoint answers getSlot with a result (a 429 / quota page / HTML error is a no)."""
+    import requests
+    try:
+        r = requests.post(url, json={"jsonrpc": "2.0", "id": 1, "method": "getSlot", "params": []}, timeout=timeout)
+        return r.status_code == 200 and isinstance(r.json().get("result"), int)
+    except Exception: return False
+
+
+def working_urls() -> tuple[str, str, str]:
+    """provider_urls(), but checked. When the configured endpoint does not answer, fall back so the stream keeps collecting.
+
+    Measured 2026-10-05: the Solami window closed at 00:00 KST and the stream restarted on SOLANA_RPC_URL as designed — but that
+    key had used up its plan ("HTTP 429 max usage reached"), so the stream ran 13 hours with logs=0, errors=6,470 and a fresh
+    heartbeat. Having a URL is not the same as the URL working. Fallback order for HTTP: Solami RPC (the key still serves HTTP
+    after the trial; only its WebSocket is refused with HTTP 400) -> public mainnet-beta. WebSocket: public mainnet-beta
+    (logsSubscribe measured at ~1 notification/s for the DBC program). Set DBC_NO_FALLBACK=1 to disable. An unset endpoint is
+    returned as is, so the caller still reports "not set" instead of quietly running on the public one."""
+    url, ws, name = provider_urls()
+    if not url or name == "solami" or os.environ.get("DBC_NO_FALLBACK") == "1" or _rpc_ok(url): return url, ws, name
+    key = solami_key(); s_rpc = solami_urls(key)["rpc"] if key else None
+    if s_rpc and _rpc_ok(s_rpc): return s_rpc, PUBLIC_WS, "fallback:solami-rpc+public-ws"
+    return PUBLIC_RPC, PUBLIC_WS, "fallback:public"
+
+
 def _f(x):
     try: return float(x)
     except (TypeError, ValueError): return None
