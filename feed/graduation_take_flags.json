@@ -1,5 +1,5 @@
 {
- "updated_utc": "2026-10-12T09:54:02Z",
+ "updated_utc": "2026-10-12T10:54:02Z",
  "threshold_pct": 20,
  "curves": [
   {
@@ -7,8 +7,17 @@
    "base_mint": "DqtT7kG8JYUdJpSHZDQXBe7hPCpDRoesG1UYyaz4KijP",
    "config": "9XTGmzq7xE54q7KXs2XkTRAnZQSDiu6angzUvQdnvxGH",
    "quote_mint": "HRkqMRAidSJxZzQk2CBWEWAowS6aqhF4TFh7Ba75EMQy",
-   "progress_pct": 39.084,
+   "progress_pct": 41.767,
    "graduation_take_pct": 25,
+   "graduation_take_creator_pct": 0
+  },
+  {
+   "pool": "7mqxggumBbuVaWHk27hg9D1nQXaLHkJTNHuggrGnnUhP",
+   "base_mint": "7xLZPwpsMsztYBTsX5PxD1SppA9gZb1JY2sRxi5xLFxS",
+   "config": "GgEC8cRCJV4t7YjhoyPNPWhP1x2qGR9Um9jUABND6Kc8",
+   "quote_mint": "EVHqNdzjCupKi4rQkbuYw52sa1m8A7jeUAMP23S9AVVq",
+   "progress_pct": 31.513,
+   "graduation_take_pct": 20,
    "graduation_take_creator_pct": 0
   },
   {
@@ -27,15 +36,6 @@
    "quote_mint": "3Cbm7njQWKCfJN9KK7pRw1NHtxAXi2Tj7fVBiAbUsato",
    "progress_pct": 0.708,
    "graduation_take_pct": 70,
-   "graduation_take_creator_pct": 0
-  },
-  {
-   "pool": "7WWHddvMcdRpXBYVG23wqGELmfM3kDRR8vEF63R77SSC",
-   "base_mint": "H5TKN5TujptmVPxvGgv1GXxpBYLEe4iKQkmCLdAH8DY1",
-   "config": "7qaK8yEhc5HcrwggqtVx7ka2fsyDJnZ46ZMb1Y42UfM5",
-   "quote_mint": "E2KCWRB4D57Lk4BNfh2dGnvJmykVhe837ZNvaLH51tpA",
-   "progress_pct": 0.021,
-   "graduation_take_pct": 50,
    "graduation_take_creator_pct": 0
   },
   {
@@ -100,6 +100,24 @@
    "progress_pct": 0.0,
    "graduation_take_pct": 99,
    "graduation_take_creator_pct": 100
+  },
+  {
+   "pool": "7WWHddvMcdRpXBYVG23wqGELmfM3kDRR8vEF63R77SSC",
+   "base_mint": "H5TKN5TujptmVPxvGgv1GXxpBYLEe4iKQkmCLdAH8DY1",
+   "config": "7qaK8yEhc5HcrwggqtVx7ka2fsyDJnZ46ZMb1Y42UfM5",
+   "quote_mint": "E2KCWRB4D57Lk4BNfh2dGnvJmykVhe837ZNvaLH51tpA",
+   "progress_pct": 0.0,
+   "graduation_take_pct": 50,
+   "graduation_take_creator_pct": 0
+  },
+  {
+   "pool": "9oL3HiY5KfEJr6J4hmBKqe7H9YjVxCtgL3Wpm1grTfzR",
+   "base_mint": "2rH6GphQquWMTQVxLmczJh8xtcaN4PDSDsHRjzvuFGrx",
+   "config": "9XTGmzq7xE54q7KXs2XkTRAnZQSDiu6angzUvQdnvxGH",
+   "quote_mint": "HRkqMRAidSJxZzQk2CBWEWAowS6aqhF4TFh7Ba75EMQy",
+   "progress_pct": 0.0,
+   "graduation_take_pct": 25,
+   "graduation_take_creator_pct": 0
   }
  ]
 }
