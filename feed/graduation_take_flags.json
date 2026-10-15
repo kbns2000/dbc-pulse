@@ -1,5 +1,5 @@
 {
- "updated_utc": "2026-10-15T13:54:01Z",
+ "updated_utc": "2026-10-15T14:54:01Z",
  "threshold_pct": 20,
  "curves": [
   {
@@ -39,6 +39,15 @@
    "graduation_take_creator_pct": 100
   },
   {
+   "pool": "5zKccwahihczBMo3HaAiYPacBQdMpNFKVpHMNne68KZS",
+   "base_mint": "H8UuP96L7w7M9sBL1wiKWCWEVb2rm5RHwUDNtZyzXqyc",
+   "config": "4VtQbW4u2zevM5pfAgtkKshdoQ2BWboXvdKR8eKtvM2G",
+   "quote_mint": "So11111111111111111111111111111111111111112",
+   "progress_pct": 0.03,
+   "graduation_take_pct": 99,
+   "graduation_take_creator_pct": 100
+  },
+  {
    "pool": "ByVJopRhJCy32afrf2iNCTwAqi7tKtEcqAyMwfUE99eq",
    "base_mint": "EsBUaUHb73CggTBMgTA4LqJWLo1Br4e83vhsAZkH8X7g",
    "config": "4VtQbW4u2zevM5pfAgtkKshdoQ2BWboXvdKR8eKtvM2G",
@@ -55,42 +64,6 @@
    "progress_pct": 0.009,
    "graduation_take_pct": 40,
    "graduation_take_creator_pct": 0
-  },
-  {
-   "pool": "5JauaUbmxGKeoKm7mLRKJvusoMFb17fSwEHfaVv8RFsC",
-   "base_mint": "4KGJexUuW1QXX3eSxhjRWRE6XPjcArXuM3ggGmzNBxyB",
-   "config": "D5fRxzvf1gmsY6bvDPNR5veTvdRM2ZRp4uyW6d4YQvDk",
-   "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 0.0,
-   "graduation_take_pct": 99,
-   "graduation_take_creator_pct": 100
-  },
-  {
-   "pool": "APUmU5cwxztWxPepCQSyrvknCp14p1B9WcKHbSYgKbny",
-   "base_mint": "4UZnYgnvwkV5S2cmDi4abLu7w6Py2BQVCyCyJg9ULvEY",
-   "config": "D5fRxzvf1gmsY6bvDPNR5veTvdRM2ZRp4uyW6d4YQvDk",
-   "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 0.0,
-   "graduation_take_pct": 99,
-   "graduation_take_creator_pct": 100
-  },
-  {
-   "pool": "naDn1Gjh69KMmTLA7afErUoRhx2NsYvR1AYV1Ccx7WY",
-   "base_mint": "J37i63YzLZ8BWWXYjGzT34oNX7KCfKEsUWw1YLkMheEt",
-   "config": "D5fRxzvf1gmsY6bvDPNR5veTvdRM2ZRp4uyW6d4YQvDk",
-   "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 0.0,
-   "graduation_take_pct": 99,
-   "graduation_take_creator_pct": 100
-  },
-  {
-   "pool": "4PgLeBbeQUg9XKEtrgAMCXPmC9euPGGsZUeFQcMvReyt",
-   "base_mint": "HDHJ6SuY5PHMZD241Bd3AtCmsA54BvMXHvt8Rp9BeU3c",
-   "config": "D5fRxzvf1gmsY6bvDPNR5veTvdRM2ZRp4uyW6d4YQvDk",
-   "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 0.0,
-   "graduation_take_pct": 99,
-   "graduation_take_creator_pct": 100
   },
   {
    "pool": "DcHzjQpxdtn9DB4YCEzuzTwh2csRhvfSJtbXRPNNBmQ",
@@ -194,6 +167,42 @@
   {
    "pool": "D9M5wDcFMqwkAsqCy4sdXT7FaS2benFAM6YUJmqKm2WZ",
    "base_mint": "EgbtskLUJ7i1rugjpMjUwSLGipqNDC71FSABBvWNAcrc",
+   "config": "4VtQbW4u2zevM5pfAgtkKshdoQ2BWboXvdKR8eKtvM2G",
+   "quote_mint": "So11111111111111111111111111111111111111112",
+   "progress_pct": 0.0,
+   "graduation_take_pct": 99,
+   "graduation_take_creator_pct": 100
+  },
+  {
+   "pool": "GtekhatsTHSRG4X2oiVX8y3Kqoinq3v5NzDRqKc5gzMS",
+   "base_mint": "3Z4qFNokRdHk3Hkod6By7p4VwLHFQrzC4xdcpFzovFRT",
+   "config": "4sGAX7yVxhMBx1HYzbeoT83oSPtFLrqoThE2ojwZMoHB",
+   "quote_mint": "So11111111111111111111111111111111111111112",
+   "progress_pct": 0.0,
+   "graduation_take_pct": 20,
+   "graduation_take_creator_pct": 0
+  },
+  {
+   "pool": "Fdafs2pWfqtXQPaZg8Ln7MWY1cEHMK5ztFUrKxMKJ2HW",
+   "base_mint": "2DhNPWczBCc6YcXNpDDxTcczqqand8ctWrvW4ACcaPKp",
+   "config": "H2uorCL4WtryzdqsdpSWEp6EfMdBqEBeCFmDTY84Erxq",
+   "quote_mint": "So11111111111111111111111111111111111111112",
+   "progress_pct": 0.0,
+   "graduation_take_pct": 20,
+   "graduation_take_creator_pct": 100
+  },
+  {
+   "pool": "ytLnpudj1k9jMQMoycaaED4Q4962Lq5hfEhhYXEhcyG",
+   "base_mint": "FPyoTvyHfCnpMoP71mgouysaEdd2q1ggfx6UBvZGhX98",
+   "config": "4VtQbW4u2zevM5pfAgtkKshdoQ2BWboXvdKR8eKtvM2G",
+   "quote_mint": "So11111111111111111111111111111111111111112",
+   "progress_pct": 0.0,
+   "graduation_take_pct": 99,
+   "graduation_take_creator_pct": 100
+  },
+  {
+   "pool": "GrYZSUqoEMh64rs4sbqhm2YNr5WFPFjeTr2YzzJ66uiB",
+   "base_mint": "GXoQYS5oweZcVWM7z6uBUggE7vjbGmVq34LQ9NN791hz",
    "config": "4VtQbW4u2zevM5pfAgtkKshdoQ2BWboXvdKR8eKtvM2G",
    "quote_mint": "So11111111111111111111111111111111111111112",
    "progress_pct": 0.0,
