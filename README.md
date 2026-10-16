@@ -12,7 +12,7 @@ Real-time data stream and analytics for **Meteora Dynamic Bonding Curve (DBC)** 
 
 Program: `dbcij3LWUppWqq96dh6gJWwBifmcGfLSB5D4DuSMaqN` (mainnet & devnet). Built during Colosseum Crypto World's Fair 2026 for the Meteora DBC side track.
 
-**Public feed (no key, refreshed hourly):** https://github.com/kbns2000/dbc-pulse/tree/feed — `summary.json`, `configs.json` (per-config completion, instant share, graduation take), `graduation_take_flags.json`, `partner_revenue.json` via `https://raw.githubusercontent.com/kbns2000/dbc-pulse/feed/feed/<file>`.
+**Public feed (no key, refreshed hourly):** https://github.com/kbns2000/dbc-pulse/tree/feed — `summary.json`, `configs.json` (per-config completion, instant share, graduation take), `graduation_take_flags.json`, `partner_revenue.json` via `https://raw.githubusercontent.com/kbns2000/dbc-pulse/feed/feed/<file>`. **Live dashboard (reads the feed in the browser, no key): https://kbns2000.github.io/dbc-pulse/**
 
 ## Architecture (v2)
 The program does ~25 tx/s in busy minutes, so per-transaction fetching is not viable on a small RPC plan (2M calls/day).
@@ -30,6 +30,7 @@ Endpoint check: at start the stream asks the configured RPC for `getSlot`. If it
 - [x] Pool state tracker (curve progress, thresholds, buy/sell pressure, per-config completion & instant-launch share) — `python -m dbc_pulse.pool_tracker`
 - [x] DAMM v2 migration mapping (`migration_damm_v2` accounts → DAMM pool) + LP realized-yield tracker per unit liquidity: fees − LVR (interval rebalancing benchmark), σ and σ²/8 theory comparison, reserve-identity self-check — `dbc_pulse/damm.py`, live in the stream (`data/migration_*.jsonl`, `data/damm_*.jsonl`, `data/damm_live.json`)
 - [x] Stream API (REST + WebSocket push) + light dashboard — `python -m dbc_pulse.api` → http://127.0.0.1:8790/ (routes: /health /pools /configs /damm /events /migrations; ws://127.0.0.1:8791/)
+- [x] Public feed (`feed` branch, refreshed hourly by the stream host) + live dashboard on GitHub Pages — https://kbns2000.github.io/dbc-pulse/ (`gh-pages` branch: one static page, no server, reads the feed in the browser)
 - [x] Tests (`python -m pytest -q`: IDL round-trip, PoolState layout, LP math incl. LVR/fees/anomaly flags, migration decoding) + GitHub Actions CI
 - [x] Videos — demo: https://youtu.be/cBaDFNhWGKk · pitch: https://youtu.be/E2WX_iJQx0I (Colosseum Crypto World's Fair, Meteora DBC track)
 
@@ -61,7 +62,9 @@ The Blur tap subscribes to `swap`, `liquidity`, `pool_create`, `graduation` and 
 Blur names the two venues `meteora_dbc` (bonding curves) and `meteora_damm2` (graduated pools). The key needs a role with the **DataApi** permission (dashboard → Members → New role → Data API, then attach it to the key under API Keys → Settings).
 
 ## API and dashboard
-`python -m dbc_pulse.api` reads only the files the stream writes (no RPC) and serves:
+**Live dashboard (public, no key): https://kbns2000.github.io/dbc-pulse/** — a static page on the `gh-pages` branch that reads the hourly [public feed](https://github.com/kbns2000/dbc-pulse/tree/feed) in the browser: feed freshness and stream health, curves flagged ⚑ for graduation take, the take distribution across launch configs, who earns from a graduation (latest `scripts/partner_revenue.py` run, top partner wallets) and the launch-config table. It re-reads the feed every 5 minutes from `raw.githubusercontent.com`; nothing runs server-side.
+
+The per-pool view below (curves closest to migration, DAMM v2 LP realized yield, recent migrations) needs the stream's data files, so it runs next to the stream: `python -m dbc_pulse.api` reads only the files the stream writes (no RPC) and serves:
 
 | route | content |
 |---|---|
