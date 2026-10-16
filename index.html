@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>dbc-pulse · live feed</title>
+<meta name="description" content="Meteora Dynamic Bonding Curve launches on Solana, read from the key-free dbc-pulse public feed: stream health, launch configs, graduation-take flags and who earns from a graduation.">
+<link rel="icon" href="https://raw.githubusercontent.com/kbns2000/dbc-pulse/main/docs/logo.png">
+<style>
+  :root { color-scheme: light; --page:#f9f9f7; --card:#fcfcfb; --fg:#0b0b0b; --fg2:#52514e; --line:#e1e0d9;
+          --accent:#2a78d6; --track:#cde2fb; --good:#006300; --dot-ok:#0ca30c; --dot-late:#fab219; --bad:#d03b3b; }
+  @media (prefers-color-scheme: dark) {
+    :root { color-scheme: dark; --page:#0d0d0d; --card:#1a1a19; --fg:#f0efec; --fg2:#c3c2b7; --line:#2c2c2a;
+            --accent:#3987e5; --track:#184f95; --good:#0ca30c; --bad:#d03b3b; }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--page); color: var(--fg); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; padding: 14px 20px; border-bottom: 1px solid var(--line); background: var(--card); }
+  header h1 { margin: 0; font-size: 20px; letter-spacing: .2px; }
+  header h1 a { color: inherit; text-decoration: none; }
+  header .sub { color: var(--fg2); }
+  #status { margin-left: auto; color: var(--fg2); font-variant-numeric: tabular-nums; }
+  .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--bad); margin-right: 6px; vertical-align: middle; }
+  .dot.ok { background: var(--dot-ok); } .dot.late { background: var(--dot-late); }
+  main { padding: 16px 20px; display: grid; grid-template-columns: 1fr; gap: 16px; max-width: 1500px; margin: 0 auto; }
+  @media (min-width: 1100px) { main { grid-template-columns: 1fr 1fr; } .wide { grid-column: 1 / -1; } }
+  @media (max-width: 600px) { header, main, footer { padding-left: 16px; padding-right: 16px; } #status { margin-left: 0; } }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; overflow: auto; min-width: 0; }
+  section h2 { margin: 0 0 6px; font-size: 15px; }
+  .hint { color: var(--fg2); font-size: 12px; margin-bottom: 8px; }
+  table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+  th, td { text-align: right; padding: 4px 6px; font-size: 13px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th:first-child, td:first-child { text-align: left; }
+  th { color: var(--fg2); font-weight: 600; font-size: 12px; }
+  th[data-k] { cursor: pointer; user-select: none; } th[data-k]:hover { color: var(--fg); }
+  th.sorted::after { content: " ▾"; } th.sorted.asc::after { content: " ▴"; }
+  .mono { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; }
+  .bar { position: relative; height: 14px; background: var(--track); border-radius: 3px; min-width: 110px; }
+  .bar i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--accent); border-radius: 3px; }
+  .bar b { position: absolute; left: 6px; top: -1px; font-size: 11px; font-weight: 600; color: var(--fg); }
+  .pos { color: var(--good); } .flag { color: var(--bad); font-weight: 600; } .err { color: var(--bad); }
+  .kpis { display: flex; flex-wrap: wrap; gap: 10px 24px; }
+  .kpi small { display: block; color: var(--fg2); font-size: 11px; } .kpi strong { font-size: 18px; font-weight: 600; }
+  .hbars { display: grid; grid-template-columns: max-content minmax(80px, 1fr) max-content; gap: 6px 10px; align-items: center; margin: 6px 0 10px; }
+  .hbars .lab { color: var(--fg2); font-size: 12px; white-space: nowrap; } .hbars .val { font-size: 12px; white-space: nowrap; }
+  .hbars .trk { height: 12px; } .hbars .trk i { display: block; height: 100%; background: var(--accent); border-radius: 3px; min-width: 2px; }
+  .hbars .trk i.warn { background: var(--bad); }
+  .kv td:first-child { color: var(--fg2); white-space: normal; }
+  button.link { background: none; border: 0; padding: 0; color: var(--accent); cursor: pointer; font: inherit; font-size: 12px; text-decoration: underline; }
+  a { color: var(--accent); }
+  footer { color: var(--fg2); font-size: 12px; padding: 8px 20px 24px; max-width: 1500px; margin: 0 auto; }
+</style>
+</head>
+<body>
+<header>
+  <h1><a href="https://github.com/kbns2000/dbc-pulse">dbc-pulse</a></h1>
+  <span class="sub">Meteora Dynamic Bonding Curve · Solana mainnet · public feed, no key</span>
+  <span id="status"><span class="dot"></span>loading feed…</span>
+</header>
+<main>
+  <section class="wide">
+    <div class="kpis" id="kpis"></div>
+    <div class="hint" style="margin: 10px 0 0">Numbers come from <code>feed/summary.json</code>, written by the live stream (<code>python -m dbc_pulse.stream</code>) and pushed to the <a href="https://github.com/kbns2000/dbc-pulse/tree/feed">feed branch</a> about hourly. <b>Graduation take</b> = the share of the raised quote that a launch config pays out to its creator/partner at migration instead of seeding the DAMM v2 pool; curves whose config takes ≥20% are flagged ⚑.</div>
+  </section>
+  <section>
+    <h2>Live curves flagged for graduation take ⚑</h2>
+    <div class="hint"><span id="flags-n">–</span> · sorted by curve progress (quote reserve / migration threshold) · take = % of the raise paid out at graduation, creator = share of that take going to the creator · <button class="link" id="flags-more">show all</button></div>
+    <table id="flags"><thead><tr><th>virtual pool</th><th>base mint</th><th>config</th><th>quote</th><th>progress</th><th>take</th><th>creator</th></tr></thead><tbody></tbody></table>
+  </section>
+  <section>
+    <h2>Graduation take across launch configs</h2>
+    <div class="hint">from <code>feed/configs.json</code> · <code>PoolConfig.migration_fee_percentage</code> decoded on-chain · <span id="take-note">–</span></div>
+    <div class="hbars" id="takebars"></div>
+    <h2 style="margin-top: 14px">Who earns from a graduation</h2>
+    <div class="hint" id="rev-meta">–</div>
+    <div id="rev-body">
+      <div class="hbars" id="revbars"></div>
+      <table class="kv" id="revparts"><tbody></tbody></table>
+    </div>
+  </section>
+  <section class="wide">
+    <h2>Top partner wallets by revenue</h2>
+    <div class="hint">fee claimer = the partner wallet named in the config · SOL, over the measurement window · curve = curve-phase trading fees, migration = migration fee, LP = post-graduation fees of the partner's migration position</div>
+    <table id="partners"><thead><tr><th>#</th><th>fee claimer</th><th>pools</th><th>total</th><th>curve</th><th>migration</th><th>LP</th></tr></thead><tbody></tbody></table>
+  </section>
+  <section class="wide">
+    <h2>Launch configs</h2>
+    <div class="hint">from tracked pools since the stream started · click a column to sort · launches / completion / instant share come from the event tracker when available (– = not measured yet) · <button class="link" id="cfg-more">show all</button></div>
+    <table id="configs"><thead><tr><th data-k="config">config</th><th data-k="pools">pools</th><th data-k="curve_complete">curve done</th><th data-k="migrated">migrated</th><th data-k="launches">launches</th><th data-k="completion_rate">completion</th><th data-k="instant_share">instant</th><th data-k="median_minutes_to_complete">med min</th><th data-k="median_swaps">med swaps</th><th data-k="graduation_take_pct">graduation take</th></tr></thead><tbody></tbody></table>
+  </section>
+</main>
+<footer>
+  Feed files (JSON, refreshed about hourly while the stream runs):
+  <a href="https://raw.githubusercontent.com/kbns2000/dbc-pulse/feed/feed/summary.json">summary</a> ·
+  <a href="https://raw.githubusercontent.com/kbns2000/dbc-pulse/feed/feed/configs.json">configs</a> ·
+  <a href="https://raw.githubusercontent.com/kbns2000/dbc-pulse/feed/feed/graduation_take_flags.json">graduation_take_flags</a> ·
+  <a href="https://raw.githubusercontent.com/kbns2000/dbc-pulse/feed/feed/partner_revenue.json">partner_revenue</a>
+  — raw URL pattern <span class="mono">https://raw.githubusercontent.com/kbns2000/dbc-pulse/feed/feed/&lt;file&gt;</span>.
+  This page re-reads them every 5 minutes (<button class="link" id="reload">refresh now</button>).
+  The full per-pool dashboard (curves closest to migration, DAMM v2 LP realized yield, recent migrations) runs next to the stream: <span class="mono">python -m dbc_pulse.api</span>.
+  Method and caveats: <a href="https://github.com/kbns2000/dbc-pulse#readme">README</a> · MIT.
+  <noscript><p class="err">This page needs JavaScript to read the feed; the JSON links above work without it.</p></noscript>
+</footer>
+<script>
+(() => {
+'use strict';
+const FEED = 'https://raw.githubusercontent.com/kbns2000/dbc-pulse/feed/feed/';
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const isNum = v => typeof v === 'number' && isFinite(v);
+const fmt = (v, d = 0) => isNum(v) ? v.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d }) : '–';
+const pct = (v, d = 1) => isNum(v) ? fmt(v, d) + '%' : '–';
+const short = (k, n = 6) => k ? k.slice(0, n) + '…' + k.slice(-4) : '';
+const SOL = 'So11111111111111111111111111111111111111112';
+const QUOTES = { [SOL]: 'SOL', EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v: 'USDC', Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB: 'USDT' };
+const link = (k, kind, n = 6) => k ? `<a class="mono" href="https://solscan.io/${kind}/${esc(k)}" target="_blank" rel="noopener" title="${esc(k)}">${esc(short(k, n))}</a>` : '–';
+const acct = (k, n = 6) => (k && k !== 'unknown') ? link(k, 'account', n) : `<span class="mono">${esc(k || '–')}</span>`;
+const quote = m => m ? (QUOTES[m] || `<span class="mono" title="${esc(m)}">${esc(short(m, 4))}</span>`) : '–';
+const takeCell = (t, c) => !isNum(t) ? '–' : `<span class="${t >= 20 ? 'flag' : ''}">${fmt(t)}%</span>${t ? ` <span style="color:var(--fg2)">(creator ${fmt(isNum(c) ? c : 0)}%)</span>` : ''}`;
+const cmp = (a, b) => { const an = isNum(a), bn = isNum(b); if (an && bn) return a - b; if (an) return 1; if (bn) return -1; return String(a ?? '').localeCompare(String(b ?? '')); };
+
+function freshness(iso) {
+  const t = Date.parse(iso || ''); if (!isFinite(t)) return { cls: '', label: 'feed age unknown', when: '–' };
+  const m = Math.max(0, Math.round((Date.now() - t) / 60000));
+  const rel = m < 60 ? `${m} min ago` : m < 2880 ? `${(m / 60).toFixed(1)} h ago` : `${Math.round(m / 1440)} d ago`;
+  const [cls, label] = m <= 90 ? ['ok', 'feed fresh'] : m <= 180 ? ['late', 'feed late'] : ['', 'feed stale'];
+  return { cls, label, when: `${String(iso).replace('T', ' ').replace('Z', ' UTC')} (${rel})` };
+}
+function renderSummary(s) {
+  const f = freshness(s.updated_utc);
+  $('#status').innerHTML = `<span class="dot ${f.cls}"></span>${f.label} · updated ${esc(f.when)}`;
+  const b = s.blur;
+  const rows = [
+    ['curves tracked', fmt(s.curves_tracked)], ['launch configs seen', fmt(s.configs_seen)], ['DAMM v2 pools tracked', fmt(s.damm_pools_tracked)],
+    ['migrations seen', fmt(s.migrations_seen)], ['⚑ graduation-take curves', fmt(s.graduation_take_flags)], ['RPC errors', fmt(s.rpc_errors)],
+    ['stream at publish', s.stream_alive === true ? '<span class="pos">live</span>' : s.stream_alive === false ? '<span class="flag">down</span>' : '–'],
+    ['provider', `<span class="mono">${esc(s.provider || '–')}</span>`],
+  ].concat(b ? [
+    ['Solami Blur events', fmt(b.events)], ['Blur lag (ms)', fmt(b.lag_ms_avg)],
+    ['reserve cross-check', isNum(b.identical) && isNum(b.compared) ? `${fmt(b.identical)}/${fmt(b.compared)} identical` : '–'],
+    ['within 2%', isNum(b.within_2pct) ? pct(100 * b.within_2pct, 0) : '–'],
+  ] : []);
+  $('#kpis').innerHTML = rows.map(([k, v]) => `<div class="kpi"><small>${k}</small><strong>${v}</strong></div>`).join('');
+}
+let flagRows = [], showAllFlags = false;
+function renderFlags(d) {
+  flagRows = (d.curves || []).slice().sort((a, b) => (b.progress_pct || 0) - (a.progress_pct || 0));
+  $('#flags-n').textContent = `${fmt(flagRows.length)} live curves above ${fmt(d.threshold_pct ?? 20)}%`;
+  drawFlags();
+}
+function drawFlags() {
+  const rows = showAllFlags ? flagRows : flagRows.slice(0, 20);
+  $('#flags-more').textContent = flagRows.length > 20 ? (showAllFlags ? 'show top 20' : `show all ${fmt(flagRows.length)}`) : '';
+  $('#flags tbody').innerHTML = rows.length ? rows.map(p => `<tr><td>${link(p.pool, 'account')}</td><td>${link(p.base_mint, 'token')}</td><td>${acct(p.config, 4)}</td><td>${quote(p.quote_mint)}</td>
+    <td><div class="bar"><i style="width:${Math.min(100, Math.max(0, p.progress_pct || 0))}%"></i><b>${pct(p.progress_pct, 1)}</b></div></td>
+    <td class="flag">${pct(p.graduation_take_pct, 0)}</td><td>${pct(p.graduation_take_creator_pct, 0)}</td></tr>`).join('')
+    : '<tr><td colspan="7">no live curve above the threshold right now</td></tr>';
+}
+const BUCKETS = [['0%', t => t === 0, ''], ['1–9%', t => t >= 1 && t < 10, ''], ['10–19%', t => t >= 10 && t < 20, ''], ['⚑ 20–49%', t => t >= 20 && t < 50, 'warn'], ['⚑ 50–99%', t => t >= 50, 'warn']];
+function renderTake(cfgs) {
+  const known = cfgs.filter(c => isNum(c.graduation_take_pct));
+  const rows = BUCKETS.map(([lab, f, cls]) => { const g = known.filter(c => f(c.graduation_take_pct)); return [lab, g.length, g.reduce((a, c) => a + (c.pools || 0), 0), cls]; });
+  const max = Math.max(1, ...rows.map(r => r[1]));
+  $('#takebars').innerHTML = rows.map(([lab, n, pools, cls]) => `<span class="lab">${lab}</span><div class="trk" title="${lab}: ${fmt(n)} configs, ${fmt(pools)} pools"><i class="${cls}" style="width:${100 * n / max}%"></i></div><span class="val">${fmt(n)} configs · ${fmt(pools)} pools</span>`).join('');
+  const unk = cfgs.length - known.length;
+  $('#take-note').textContent = `${fmt(known.length)} configs with a decoded config${unk ? `, ${fmt(unk)} without` : ''}`;
+}
+function renderRevenue(r) {
+  if (!r) {
+    $('#rev-meta').textContent = 'partner_revenue.json is not in the feed yet (it appears after scripts/partner_revenue.py has run on the stream host).';
+    $('#rev-body').style.display = 'none'; $('#partners').closest('section').style.display = 'none'; return;
+  }
+  $('#rev-body').style.display = ''; $('#partners').closest('section').style.display = '';
+  const t = r.totals_sol || {}, pp = r.per_pool_sol || {};
+  const when = isNum(r.measured_at) ? new Date(r.measured_at * 1000).toISOString().replace('T', ' ').slice(0, 16) + ' UTC' : '–';
+  $('#rev-meta').innerHTML = `read on-chain ${esc(when)} · window ${fmt(r.window_h, 1)} h · ${fmt(r.graduations_scored)} SOL-quoted graduations scored · ${esc(r.method || '')}`;
+  const bars = [['partner (config owner)', t.partner_total], ['creator', t.creator_total], ['protocol (curve fees)', t.protocol_curve]];
+  const max = Math.max(1, ...bars.map(b => b[1] || 0));
+  $('#revbars').innerHTML = bars.map(([lab, v]) => `<span class="lab">${lab}</span><div class="trk" title="${lab}: ${fmt(v, 1)} SOL"><i style="width:${100 * (v || 0) / max}%"></i></div><span class="val">${fmt(v)} SOL</span>`).join('');
+  $('#revparts tbody').innerHTML = [
+    ['curve-phase trading fees', `${fmt(t.trade_fee)} SOL · protocol ${fmt(t.protocol_curve)} · partner ${fmt(t.curve_partner)}`],
+    ['post-graduation LP fees (the two migration positions)', `${fmt(t.lp_total)} SOL · partner share ${fmt(t.lp_partner)}`],
+    ['migration fee to partners', `${fmt(t.migration_partner)} SOL`],
+    ['partner revenue per graduated pool', `median ${fmt(pp.median, 4)} · p90 ${fmt(pp.p90, 3)} · max ${fmt(pp.max)} SOL`],
+  ].map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('');
+  $('#partners tbody').innerHTML = (r.top_partners || []).map((p, i) => `<tr><td>${i + 1}</td><td>${link(p.fee_claimer, 'account', 8)}</td><td>${fmt(p.pools)}</td><td>${fmt(p.total, 1)}</td><td>${fmt(p.curve, 1)}</td><td>${fmt(p.migration, 1)}</td><td>${fmt(p.lp, 1)}</td></tr>`).join('');
+}
+let allCfg = [], showAll = false, sortKey = 'pools', sortDir = -1;
+function renderConfigs() {
+  const rows = allCfg.slice().sort((a, b) => cmp(a[sortKey], b[sortKey]) * sortDir || cmp(b.pools, a.pools));
+  const shown = showAll ? rows : rows.slice(0, 30);
+  $('#configs tbody').innerHTML = shown.map(c => `<tr><td>${acct(c.config)}</td><td>${fmt(c.pools)}</td><td>${fmt(c.curve_complete)}</td><td>${fmt(c.migrated)}</td><td>${fmt(c.launches)}</td>
+    <td>${isNum(c.completion_rate) ? pct(100 * c.completion_rate, 0) : '–'}</td><td>${isNum(c.instant_share) ? pct(100 * c.instant_share, 0) : '–'}</td>
+    <td>${fmt(c.median_minutes_to_complete, 1)}</td><td>${fmt(c.median_swaps)}</td><td>${takeCell(c.graduation_take_pct, c.graduation_take_creator_pct)}</td></tr>`).join('');
+  $('#cfg-more').textContent = showAll ? 'show top 30' : `show all ${fmt(allCfg.length)}`;
+  document.querySelectorAll('#configs th[data-k]').forEach(th => { th.classList.toggle('sorted', th.dataset.k === sortKey); th.classList.toggle('asc', th.dataset.k === sortKey && sortDir === 1); });
+}
+document.querySelectorAll('#configs th[data-k]').forEach(th => th.addEventListener('click', () => { const k = th.dataset.k; sortDir = (k === sortKey) ? -sortDir : -1; sortKey = k; renderConfigs(); }));
+$('#cfg-more').addEventListener('click', () => { showAll = !showAll; renderConfigs(); });
+$('#flags-more').addEventListener('click', () => { showAllFlags = !showAllFlags; drawFlags(); });
+$('#reload').addEventListener('click', refresh);
+
+async function getJSON(name) {
+  const r = await fetch(FEED + name + '?t=' + Math.floor(Date.now() / 300000), { cache: 'no-cache' });
+  if (!r.ok) throw new Error(`${name}: HTTP ${r.status}`);
+  return r.json();
+}
+async function refresh() {
+  const [s, c, f, r] = await Promise.allSettled(['summary.json', 'configs.json', 'graduation_take_flags.json', 'partner_revenue.json'].map(getJSON));
+  if (s.status === 'fulfilled') renderSummary(s.value); else $('#status').innerHTML = `<span class="dot"></span><span class="err">feed unreachable (${esc(s.reason && s.reason.message)})</span>`;
+  if (c.status === 'fulfilled') { allCfg = c.value.configs || []; renderTake(allCfg); renderConfigs(); }
+  if (f.status === 'fulfilled') renderFlags(f.value);
+  renderRevenue(r.status === 'fulfilled' ? r.value : null);
+}
+refresh(); setInterval(refresh, 300000);
+})();
+</script>
+</body>
+</html>
