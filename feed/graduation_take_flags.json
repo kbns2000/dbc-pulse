@@ -1,13 +1,31 @@
 {
- "updated_utc": "2026-10-17T22:54:01Z",
+ "updated_utc": "2026-10-17T23:54:01Z",
  "threshold_pct": 20,
  "curves": [
+  {
+   "pool": "7x88c8n9ENCQkQVkNWnrUBs2tDBH4dciRqDnrSt1ivh",
+   "base_mint": "D4smvGpvWNPXaFEdYE5dGpcXLZZybbHmnDSo137TYnoc",
+   "config": "Xbet39vjiD3uh4p4sXhmizN95qWDSCEmryqeXFDKWKC",
+   "quote_mint": "So11111111111111111111111111111111111111112",
+   "progress_pct": 88.35,
+   "graduation_take_pct": 99,
+   "graduation_take_creator_pct": 100
+  },
+  {
+   "pool": "ExTZuMAJXXJJmYCDR1bSE2YsWMZtkcBvb8JVjJKAweCB",
+   "base_mint": "B18UmHYDPtgF8tnzPfNphNmqRzSRjTNrDx1fAAxtGLxf",
+   "config": "38sUx8wbQ739tTYBdoaChUfZzNzdSb63KcxnGvkukqXj",
+   "quote_mint": "6ombVv3YMs9qpx1QkycD9XW8HKSfv7vGrCFX3cxCYMVY",
+   "progress_pct": 49.556,
+   "graduation_take_pct": 40,
+   "graduation_take_creator_pct": 0
+  },
   {
    "pool": "GHhHroNZ9FXFEW9F6FH9bMfuEJFk3G1pFchaoaPq9Fvr",
    "base_mint": "CY9BaZaS9V98rg4M6CnGQsXASe9PNTvbE5ZzETrYmP5s",
    "config": "A7gVFKPtmpGoawgChdpmKaQRdLQJJyMWWBr43fQtqisZ",
    "quote_mint": "6ombVv3YMs9qpx1QkycD9XW8HKSfv7vGrCFX3cxCYMVY",
-   "progress_pct": 35.739,
+   "progress_pct": 38.92,
    "graduation_take_pct": 20,
    "graduation_take_creator_pct": 0
   },
@@ -16,16 +34,7 @@
    "base_mint": "Cp4MN5QLP5XvEBafuVcgTqBK71ihxujWdSsyi6UijogR",
    "config": "A7gVFKPtmpGoawgChdpmKaQRdLQJJyMWWBr43fQtqisZ",
    "quote_mint": "6ombVv3YMs9qpx1QkycD9XW8HKSfv7vGrCFX3cxCYMVY",
-   "progress_pct": 18.195,
-   "graduation_take_pct": 20,
-   "graduation_take_creator_pct": 0
-  },
-  {
-   "pool": "6bbpsvPRFNwqeZJqx36S6UWHF8URDUJEHwcXzUETYCVU",
-   "base_mint": "6vatZh549Exd5a3ki7ocpwpXgm3eeeFDQufDeVHT4xru",
-   "config": "A7gVFKPtmpGoawgChdpmKaQRdLQJJyMWWBr43fQtqisZ",
-   "quote_mint": "6ombVv3YMs9qpx1QkycD9XW8HKSfv7vGrCFX3cxCYMVY",
-   "progress_pct": 13.23,
+   "progress_pct": 23.23,
    "graduation_take_pct": 20,
    "graduation_take_creator_pct": 0
   },
@@ -34,16 +43,16 @@
    "base_mint": "2LynUA9eSSCypiTYzSbppt9KcDJR4eQ5XiZTY6X3kzn9",
    "config": "A7gVFKPtmpGoawgChdpmKaQRdLQJJyMWWBr43fQtqisZ",
    "quote_mint": "6ombVv3YMs9qpx1QkycD9XW8HKSfv7vGrCFX3cxCYMVY",
-   "progress_pct": 11.073,
+   "progress_pct": 19.822,
    "graduation_take_pct": 20,
    "graduation_take_creator_pct": 0
   },
   {
-   "pool": "75ojwi8LcS3MLgbowGMLnJ7SAs4xPLuu3C3gbhyppk1x",
-   "base_mint": "7nujJnyyFSrAbzn66NNK3eUvpLPQy97HnX9CABMt9fdW",
+   "pool": "6bbpsvPRFNwqeZJqx36S6UWHF8URDUJEHwcXzUETYCVU",
+   "base_mint": "6vatZh549Exd5a3ki7ocpwpXgm3eeeFDQufDeVHT4xru",
    "config": "A7gVFKPtmpGoawgChdpmKaQRdLQJJyMWWBr43fQtqisZ",
    "quote_mint": "6ombVv3YMs9qpx1QkycD9XW8HKSfv7vGrCFX3cxCYMVY",
-   "progress_pct": 4.079,
+   "progress_pct": 12.298,
    "graduation_take_pct": 20,
    "graduation_take_creator_pct": 0
   },
@@ -52,7 +61,7 @@
    "base_mint": "64Khzy5xp84mwFWLCwJhA8PdGzvJ5mY8pdSnu66fxzvn",
    "config": "38sUx8wbQ739tTYBdoaChUfZzNzdSb63KcxnGvkukqXj",
    "quote_mint": "6ombVv3YMs9qpx1QkycD9XW8HKSfv7vGrCFX3cxCYMVY",
-   "progress_pct": 2.849,
+   "progress_pct": 5.562,
    "graduation_take_pct": 40,
    "graduation_take_creator_pct": 0
   },
@@ -62,6 +71,15 @@
    "config": "A7gVFKPtmpGoawgChdpmKaQRdLQJJyMWWBr43fQtqisZ",
    "quote_mint": "6ombVv3YMs9qpx1QkycD9XW8HKSfv7vGrCFX3cxCYMVY",
    "progress_pct": 2.747,
+   "graduation_take_pct": 20,
+   "graduation_take_creator_pct": 0
+  },
+  {
+   "pool": "75ojwi8LcS3MLgbowGMLnJ7SAs4xPLuu3C3gbhyppk1x",
+   "base_mint": "7nujJnyyFSrAbzn66NNK3eUvpLPQy97HnX9CABMt9fdW",
+   "config": "A7gVFKPtmpGoawgChdpmKaQRdLQJJyMWWBr43fQtqisZ",
+   "quote_mint": "6ombVv3YMs9qpx1QkycD9XW8HKSfv7vGrCFX3cxCYMVY",
+   "progress_pct": 2.178,
    "graduation_take_pct": 20,
    "graduation_take_creator_pct": 0
   },
@@ -156,24 +174,6 @@
    "graduation_take_creator_pct": 100
   },
   {
-   "pool": "2bzTMxwgLatkLQSR53bUK9LhMu5EAtu4S4Uy27poZ2sG",
-   "base_mint": "98xqcEDYqTK2tyuVwTxcan3YXprcA5Y21EmuNcGPoYFf",
-   "config": "7mfYPpPAP7SsoKGWRP2LZwCBXnWpR4pP3tyA7BpQ4ckw",
-   "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 0.006,
-   "graduation_take_pct": 99,
-   "graduation_take_creator_pct": 100
-  },
-  {
-   "pool": "HCjhrkD9VowHDuSJnqiXmJBqGLShDgVsYWsaCChQqAnk",
-   "base_mint": "Fb5xn3bpCkvBHT1hFW7SGmmKYyFCEGsgs1kRgq72Pxrr",
-   "config": "4PYKCfTiuDkyyMuhrtB62cijSr9qJEKoHmpfgmrfgS2b",
-   "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 0.006,
-   "graduation_take_pct": 99,
-   "graduation_take_creator_pct": 100
-  },
-  {
    "pool": "85Z7kFLfgxeWnxokqoqYdeu1rfWqjcpCEyt7msnDLQZu",
    "base_mint": "HtSS8byieZebBR2oDAFeHN88Jgyz9Dg8QxtL4qusoAmh",
    "config": "BTFzicS9iiNx2dHTZkedT4ZiT78Lyo8PkXCy2meqKjTg",
@@ -183,144 +183,9 @@
    "graduation_take_creator_pct": 100
   },
   {
-   "pool": "E1kcBmucu7gZnuNiALNvrt46XrxsrShWGnUjsVdX3sZs",
-   "base_mint": "HJTBWxAr7smjXpb7DXvCQksxzudV8vVvgr6oiyucr1HW",
-   "config": "6D7RcGdKwbGxAZKxpjVakw9yL8TkkpDSrVaUjCCDKoJv",
-   "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 0.0,
-   "graduation_take_pct": 99,
-   "graduation_take_creator_pct": 100
-  },
-  {
-   "pool": "HpHc85ry4Bvg417QCbXMmSG2vrkypss7VpwWG44McXvL",
-   "base_mint": "95ZpLSqwts3Wj8PXNyFAYfyHJkP71TriyYd8WzP8yA8F",
-   "config": "HoBPkpCsacKECeWVvrbdQkaekY3sdBcAFeHZEpx1wDJH",
-   "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 0.0,
-   "graduation_take_pct": 99,
-   "graduation_take_creator_pct": 100
-  },
-  {
-   "pool": "Rzorjj422udDaDRQG3p99LuXvfGsixFRhLFy4LpQxTW",
-   "base_mint": "5LyvMNtH98teFDS1hwzDz9Pxg4gYbzdWanUjWJmNdFLW",
-   "config": "HoBPkpCsacKECeWVvrbdQkaekY3sdBcAFeHZEpx1wDJH",
-   "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 0.0,
-   "graduation_take_pct": 99,
-   "graduation_take_creator_pct": 100
-  },
-  {
-   "pool": "3jypk5womVxMWG74zDSRiK4Kcyou9Wk3w9ajK3pkdrSS",
-   "base_mint": "CNrVDjkAMS9VmCUExrJPegkF15MZNpUEPPB3kr2udmBN",
-   "config": "HoBPkpCsacKECeWVvrbdQkaekY3sdBcAFeHZEpx1wDJH",
-   "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 0.0,
-   "graduation_take_pct": 99,
-   "graduation_take_creator_pct": 100
-  },
-  {
-   "pool": "BW1D7kXLfCa5VdfS25Gtz5wmw4q8co9Bwxo9bxJyJrNS",
-   "base_mint": "zwqJWunqdhmeSeDxoR7rdLdDqofw6JRPajKkDfgMpYy",
-   "config": "HoBPkpCsacKECeWVvrbdQkaekY3sdBcAFeHZEpx1wDJH",
-   "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 0.0,
-   "graduation_take_pct": 99,
-   "graduation_take_creator_pct": 100
-  },
-  {
-   "pool": "5DEjh17A85UrujQWCaLw7NJpZNtySt31ZmcFoHfMQFph",
-   "base_mint": "2maU2ZwqNEUTMLoSFwR4DnN1ZeEwAh75LvC1LvkDMykv",
-   "config": "HoBPkpCsacKECeWVvrbdQkaekY3sdBcAFeHZEpx1wDJH",
-   "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 0.0,
-   "graduation_take_pct": 99,
-   "graduation_take_creator_pct": 100
-  },
-  {
-   "pool": "6MRwwNZth1ZST1T1SepMVgW5KCHLnoDPfzbEMesEnZfu",
-   "base_mint": "G9GjLQCS88aYvM7ZaBjMrC8p2UqdTTzsEN8KUqyY7vk7",
-   "config": "HoBPkpCsacKECeWVvrbdQkaekY3sdBcAFeHZEpx1wDJH",
-   "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 0.0,
-   "graduation_take_pct": 99,
-   "graduation_take_creator_pct": 100
-  },
-  {
-   "pool": "FhCijAyrYymeBzVx5nRMvstxkQs46q1kpcGR1JfrKUSy",
-   "base_mint": "3qgc9FrJtvNeHEB6rMpyrsJ6nj7UT2UPHTqp9p1PPrVW",
-   "config": "7mfYPpPAP7SsoKGWRP2LZwCBXnWpR4pP3tyA7BpQ4ckw",
-   "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 0.0,
-   "graduation_take_pct": 99,
-   "graduation_take_creator_pct": 100
-  },
-  {
-   "pool": "CrRt4cuGdX364R86cF173ZE1MMbH6yFtrrkiUvUpvQgG",
-   "base_mint": "C6W2JE92eGHpGzT6M8vtCc944iv9D6Mrjoc8L7GdFtvE",
-   "config": "7mfYPpPAP7SsoKGWRP2LZwCBXnWpR4pP3tyA7BpQ4ckw",
-   "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 0.0,
-   "graduation_take_pct": 99,
-   "graduation_take_creator_pct": 100
-  },
-  {
-   "pool": "6wTEvKtMnT3oi6rvwvPAiLrhK1Pgi1rug7hTuzh9d5su",
-   "base_mint": "JCRpDaCiTEXTeoVeesXUCjTJER219jB4uaMSS6Uds7qs",
-   "config": "7mfYPpPAP7SsoKGWRP2LZwCBXnWpR4pP3tyA7BpQ4ckw",
-   "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 0.0,
-   "graduation_take_pct": 99,
-   "graduation_take_creator_pct": 100
-  },
-  {
-   "pool": "ARCZSMittCpbrxyyyGEhpWfKYCoHVwuF49ZzsReNXzrw",
-   "base_mint": "HJXdCsVS1tsXyJ4oa5s6onkerGymchLLCtd5XHz66N4B",
-   "config": "7mfYPpPAP7SsoKGWRP2LZwCBXnWpR4pP3tyA7BpQ4ckw",
-   "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 0.0,
-   "graduation_take_pct": 99,
-   "graduation_take_creator_pct": 100
-  },
-  {
    "pool": "DCXZKPobgCBGeDWfuCUfCNbaTh2a5WnSattHnE2eMbDD",
    "base_mint": "3fj8E3Usvnf7vntsQELZCBBfxMVDTVdTKnv5Spc2nhMj",
    "config": "7mfYPpPAP7SsoKGWRP2LZwCBXnWpR4pP3tyA7BpQ4ckw",
-   "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 0.0,
-   "graduation_take_pct": 99,
-   "graduation_take_creator_pct": 100
-  },
-  {
-   "pool": "FF6UZ4FjDN2WCkvt4jX1M3tje5FwC8ysZbc4x3odqSg",
-   "base_mint": "5mx6zPwibBSPFWmsrNjFMPArn32rFgU6oMcHDWeLSnYB",
-   "config": "EWFcFn4LrB8nguhRLofzfkq7H4D1Spw7cyQYcweeaKiR",
-   "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 0.0,
-   "graduation_take_pct": 99,
-   "graduation_take_creator_pct": 100
-  },
-  {
-   "pool": "4FPZyXdtP7MypX5ZKdugxRQfSSa7HfRez3KFrYSPAsED",
-   "base_mint": "8mUVD6CCnrrgLWExy92ShWKm2zN8zbfijL1RJNPWLeTC",
-   "config": "EWFcFn4LrB8nguhRLofzfkq7H4D1Spw7cyQYcweeaKiR",
-   "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 0.0,
-   "graduation_take_pct": 99,
-   "graduation_take_creator_pct": 100
-  },
-  {
-   "pool": "ZQWxSaYL9XMhhgqrUBJvj3DpK5v4Ksiu6jaUNq3f6aP",
-   "base_mint": "2Fhg1tRVtGhhcbJk13zr4f4t6Yq2uCUJMcuZ4qgn2nzk",
-   "config": "EWFcFn4LrB8nguhRLofzfkq7H4D1Spw7cyQYcweeaKiR",
-   "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 0.0,
-   "graduation_take_pct": 99,
-   "graduation_take_creator_pct": 100
-  },
-  {
-   "pool": "6w796bMrfMKchp8Zz9qQCRkR8tvXAYUM4TWkRyEuTYAa",
-   "base_mint": "FtvVPqjL1XRz2RHDHYb9BL71m5yyYjfwZ2Vw1Xiw1XYs",
-   "config": "EWFcFn4LrB8nguhRLofzfkq7H4D1Spw7cyQYcweeaKiR",
    "quote_mint": "So11111111111111111111111111111111111111112",
    "progress_pct": 0.0,
    "graduation_take_pct": 99,
@@ -534,6 +399,15 @@
    "graduation_take_creator_pct": 100
   },
   {
+   "pool": "HCjhrkD9VowHDuSJnqiXmJBqGLShDgVsYWsaCChQqAnk",
+   "base_mint": "Fb5xn3bpCkvBHT1hFW7SGmmKYyFCEGsgs1kRgq72Pxrr",
+   "config": "4PYKCfTiuDkyyMuhrtB62cijSr9qJEKoHmpfgmrfgS2b",
+   "quote_mint": "So11111111111111111111111111111111111111112",
+   "progress_pct": 0.0,
+   "graduation_take_pct": 99,
+   "graduation_take_creator_pct": 100
+  },
+  {
    "pool": "4jQZjpSeJCc1QMmYvqdmtUZ2SkLrfVJnuT9rYhk4jHaZ",
    "base_mint": "75QK4E4ctwDM2hZvuDRQo6Q7JkGRrJp96gGHMiSmj1gK",
    "config": "4PYKCfTiuDkyyMuhrtB62cijSr9qJEKoHmpfgmrfgS2b",
@@ -608,6 +482,24 @@
   {
    "pool": "2RMrum2VctZVzNfC4cuJVFsEpDReHdoJruVhzrJPgMs2",
    "base_mint": "3ugw7PKyQN6C4gdR6juiWEnecAi2SjnG1tTinpxRJ1gk",
+   "config": "BTFzicS9iiNx2dHTZkedT4ZiT78Lyo8PkXCy2meqKjTg",
+   "quote_mint": "So11111111111111111111111111111111111111112",
+   "progress_pct": 0.0,
+   "graduation_take_pct": 99,
+   "graduation_take_creator_pct": 100
+  },
+  {
+   "pool": "Etj7jwpcWmpFyPZdEhK9Ydturha77Y1E4meLoXVBD6rA",
+   "base_mint": "6sreY4BDXsjo7CEtDiZ6CG8cEKNaATjcjVD8x35PwG21",
+   "config": "BTFzicS9iiNx2dHTZkedT4ZiT78Lyo8PkXCy2meqKjTg",
+   "quote_mint": "So11111111111111111111111111111111111111112",
+   "progress_pct": 0.0,
+   "graduation_take_pct": 99,
+   "graduation_take_creator_pct": 100
+  },
+  {
+   "pool": "EGA28pmtPau4NnRqh6p9mvMQWBn8pRaYFLRD6esM8CZP",
+   "base_mint": "CecYS4fLz92y9Rikz9UrPjjgAiEKJfia3kiaTNzTLncF",
    "config": "BTFzicS9iiNx2dHTZkedT4ZiT78Lyo8PkXCy2meqKjTg",
    "quote_mint": "So11111111111111111111111111111111111111112",
    "progress_pct": 0.0,
