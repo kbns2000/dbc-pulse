@@ -1,5 +1,5 @@
 {
- "updated_utc": "2026-10-31T01:22:57Z",
+ "updated_utc": "2026-10-31T01:54:02Z",
  "threshold_pct": 20,
  "curves": [
   {
@@ -16,7 +16,7 @@
    "base_mint": "F5aKUzz8nzFYFd3pEZfwpfbb1DH7HKdZw9uz8pS7TLsq",
    "config": "DWnqsGTgDyGEJz6MLcD9NB9q292oduvX2gUBLmt64HsX",
    "quote_mint": "6ombVv3YMs9qpx1QkycD9XW8HKSfv7vGrCFX3cxCYMVY",
-   "progress_pct": 44.743,
+   "progress_pct": 47.115,
    "graduation_take_pct": 20,
    "graduation_take_creator_pct": 0
   },
@@ -255,33 +255,6 @@
    "graduation_take_creator_pct": 0
   },
   {
-   "pool": "5ANCidnwcnHHZxgFK3kcxHGdygdfmr3gd8UcFKBtG8pJ",
-   "base_mint": "BN4TfNE6tR7G9eVsdMYMLbg4nrcVczN7G74i5FLoJawL",
-   "config": "HSBAQPB1q1981N8o1dGHQBvzPuJgsF7QfTt8JHPQUxS7",
-   "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 0.0,
-   "graduation_take_pct": 99,
-   "graduation_take_creator_pct": 100
-  },
-  {
-   "pool": "6aQQxsf66TVWAGCCK3gEkbZwG8FLGTJwk7n57zDpBsvE",
-   "base_mint": "FYbHtpZpBUi8NbMUC5mdMVP2TQWs9GEWN7mzgobsEtaZ",
-   "config": "8fSsh1c59t7NDHCdyjwRVE9zBbbxPBUnvoYVd2QbjRWr",
-   "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 0.0,
-   "graduation_take_pct": 99,
-   "graduation_take_creator_pct": 100
-  },
-  {
-   "pool": "CkA35AW2WUJ8PPibCC78zrz65r3bWHexrcLQbReGaXEi",
-   "base_mint": "4rb2HQgLeoj9ZnV81hQZ57RgRenEgi1iQxRtTT1xrNQ8",
-   "config": "F6Wp6cXPRLMQqgH3YNnjGRY86c4RNRDr5tVi7Fn5EvaX",
-   "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 0.0,
-   "graduation_take_pct": 99,
-   "graduation_take_creator_pct": 100
-  },
-  {
    "pool": "4BFzivXv1ghvcYtBZZmaenuzrCF9AAd8WdNcRfcb1DQs",
    "base_mint": "3ExHwH259YipFxqzaurjy8ti7WMmCkEKmPDVPwcyH7ap",
    "config": "DWnqsGTgDyGEJz6MLcD9NB9q292oduvX2gUBLmt64HsX",
@@ -289,60 +262,6 @@
    "progress_pct": 0.0,
    "graduation_take_pct": 20,
    "graduation_take_creator_pct": 0
-  },
-  {
-   "pool": "6CuRNaR5ZMN6FGmytp8fRvvbkcHjhDQ1pTySELKwNvQf",
-   "base_mint": "6rBA7JAZ5dBrfmD77M3Jmudj7tF84QGZ8SXVwF3HjLXv",
-   "config": "HzH3gEVY4PBheqFpU5kGwMDQfaj7ga5LQY2nmjddQVmz",
-   "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 0.0,
-   "graduation_take_pct": 99,
-   "graduation_take_creator_pct": 100
-  },
-  {
-   "pool": "BDzipG6KHPqgxvRzRVowEgqniKMzeC7pkHeeJei1hqhG",
-   "base_mint": "BM3Eob6KxsmVr2KkgABc8435U8SQtMfqLkxje5HgKhmr",
-   "config": "9ACtMoGpEA2jyUm6GMbKYEtyKU1LAJbjvEYAEQmvzkiL",
-   "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 0.0,
-   "graduation_take_pct": 99,
-   "graduation_take_creator_pct": 100
-  },
-  {
-   "pool": "7v6AqVVkqVTBCxHjQmTFFGgmeX4huFT9dbi5xtAxEy94",
-   "base_mint": "HKBUFNcR61Yh5gPkyUUZPfstBCbQu3aa2Smg8fqFeYVt",
-   "config": "9ACtMoGpEA2jyUm6GMbKYEtyKU1LAJbjvEYAEQmvzkiL",
-   "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 0.0,
-   "graduation_take_pct": 99,
-   "graduation_take_creator_pct": 100
-  },
-  {
-   "pool": "EF25FTiS1hsfHcfBsgwcQKC2dyDDabuPVvYrPf5XxcHR",
-   "base_mint": "6KAeCGSr1zHz1Cj2ckCRxJz1jbvKgA2HCR6sPDsU5611",
-   "config": "8XaYVSoXnV5QvBMkF8tnPT19LZVWSZF2ifAKtxDafctc",
-   "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 0.0,
-   "graduation_take_pct": 99,
-   "graduation_take_creator_pct": 100
-  },
-  {
-   "pool": "HBEnhNihuhbpJJQYj82J46UBwajGTFy7pUmZFYBPANj1",
-   "base_mint": "5PNNR81owKdFzAZWVKQpqzCq1rb6z8Pk1YcLu6AxrFV3",
-   "config": "6WBaw8uZrpsKTnb2qCdtb8iMYsYzx6XurcThFLtARuaW",
-   "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 0.0,
-   "graduation_take_pct": 99,
-   "graduation_take_creator_pct": 100
-  },
-  {
-   "pool": "BT8CU6r4A6mDFSCbq9toFL8wrmVBVrXVPhjZqrNHvPgz",
-   "base_mint": "AgqENfVpcEhBzc3K2hteMhsZXem4hmQxpJHN2Vs83T85",
-   "config": "AQDYMiSZBwDi8drd4TFFisVSVLQqsJARqcCbadaq3VL6",
-   "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 0.0,
-   "graduation_take_pct": 99,
-   "graduation_take_creator_pct": 100
   },
   {
    "pool": "9SNBpFWpGEfsmTgXPDa64S9E4zzQWRegoJckXgQpyofU",
