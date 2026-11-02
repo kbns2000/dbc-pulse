@@ -1,78 +1,78 @@
 {
- "measured_at": 1793496324.7313967,
- "window_h": 828.7990334892935,
- "graduations_scored": 58239,
+ "measured_at": 1793582853.0689976,
+ "window_h": 852.8346811894576,
+ "graduations_scored": 59851,
  "totals_sol": {
-  "curve_partner": 3595.862470075296,
-  "migration_partner": 694.8430412764404,
-  "lp_partner": 8626.907848711393,
-  "lp_total": 14008.179620922949,
-  "partner_total": 12917.61336006313,
-  "creator_total": 16911.50469740228,
-  "protocol_curve": 1104.70886044,
-  "trade_fee": 5523.5443022
+  "curve_partner": 3687.938360266256,
+  "migration_partner": 730.8655490900404,
+  "lp_partner": 8732.191348948427,
+  "lp_total": 14452.847398123624,
+  "partner_total": 13150.995258304723,
+  "creator_total": 17426.704258414422,
+  "protocol_curve": 1129.1145910888001,
+  "trade_fee": 5645.572955444
  },
  "per_pool_sol": {
-  "median": 0.0036158568000000005,
-  "p90": 0.074312336,
-  "max": 2536.1689972099107
+  "median": 0.0039422152,
+  "p90": 0.0750541056,
+  "max": 2542.1671304662036
  },
  "top_partners": [
   {
    "fee_claimer": "FDyt8jhXXQMtyg5vpphsuQkoRAtJxX3VUCMTNN7g2E2E",
    "pools": 1,
-   "total": 2536.1689972099107,
+   "total": 2542.1671304662036,
    "curve": 158.5783643344,
    "migration": 0.0,
-   "lp": 2377.590632875511
+   "lp": 2383.588766131804
   },
   {
    "fee_claimer": "FAhSCfTXRWP9PJ27eVap3gVBQxXNt7wq1SfZKeX4uxGH",
    "pools": 1,
-   "total": 1269.84588332012,
+   "total": 1270.09226987912,
    "curve": 635.1744344072001,
    "migration": 4.0773972589200005,
-   "lp": 630.594051654
+   "lp": 630.840438213
   },
   {
    "fee_claimer": "6pdsnYdpLyrWGSSucaZBui9izxQ7Ubg7bYesa8RQbZ7X",
    "pools": 4,
-   "total": 1174.5433208614,
+   "total": 1178.5316042784,
    "curve": 101.35140269040001,
    "migration": 0.0,
-   "lp": 1073.191918171
+   "lp": 1077.180201588
   },
   {
    "fee_claimer": "H4SijuwZe9G3cbLQeZJ15ydEimGpmKCtgxuk9avXZBRG",
    "pools": 1,
-   "total": 1120.8989712878051,
+   "total": 1121.0968569642798,
    "curve": 23.646896852,
    "migration": 0.0,
-   "lp": 1097.252074435805
+   "lp": 1097.44996011228
   },
   {
    "fee_claimer": "5Yix3R5nj7iUVVDfrAPvbPKM9j18oAto8eiJ5BjXUn7g",
    "pools": 1,
-   "total": 780.6870831281165,
+   "total": 784.6393494474021,
    "curve": 35.7936774384,
    "migration": 9.6239738905,
-   "lp": 735.2694317992165
+   "lp": 739.2216981185021
   },
   {
    "fee_claimer": "HRpRPgAa6Y5dxyuGY87Bp6YaG9SB1wxytCov2XTUY6Dm",
    "pools": 1,
-   "total": 308.2427450970971,
+   "total": 308.2433365303031,
    "curve": 5.886214876,
    "migration": 0.0,
-   "lp": 302.3565302210971
+   "lp": 302.3571216543031
   },
   {
    "fee_claimer": "GZjYfGyUNQfDChcQ66Gc3ZMcQqPEisyRYe1nPyQhP9bp",
    "pools": 3,
-   "total": 266.582589769,
+   "total": 266.602374855,
    "curve": 41.7479624192,
    "migration": 12.2107033598,
-   "lp": 212.62392399
+   "lp": 212.64370907600002
   },
   {
    "fee_claimer": "B65YoB6bKEyBgS7TjbCxgDebxhH9UNRGocdNXetFcY6K",
@@ -101,26 +101,26 @@
   {
    "fee_claimer": "8znvUc6wAoZ9s4vosKVTRDZoAEVN1D9y3dQAohJeS5z6",
    "pools": 1,
-   "total": 188.2090723884,
+   "total": 188.20916443939998,
    "curve": 5.896198902400001,
    "migration": 0.0,
-   "lp": 182.312873486
+   "lp": 182.312965537
   },
   {
    "fee_claimer": "8LedJuF1nmcEBbKgjWG6nu1gJsuaQYJfUiXVh65TX7Ju",
    "pools": 2,
-   "total": 158.0955156366787,
+   "total": 158.1171123895757,
    "curve": 1.7553679928,
    "migration": 152.528,
-   "lp": 3.812147643878658
+   "lp": 3.83374439677571
   },
   {
    "fee_claimer": "8xrjZev9kBECg761fDd6s4AUs1KYSEwhjQy62HyE5EcP",
    "pools": 1,
-   "total": 151.5206955473309,
+   "total": 151.5232829553309,
    "curve": 17.208857431200002,
    "migration": 0.0,
-   "lp": 134.3118381161309
+   "lp": 134.31442552413088
   },
   {
    "fee_claimer": "5cyNPbLJLn5XUHqWAyV2Xt27NCrnuj7ywpJn7v6dNfWS",
@@ -140,41 +140,41 @@
   },
   {
    "fee_claimer": "AqUCiEBR9yW54V8At8CDfTMgi4qQmdPKNGAkBqvYUrAu",
-   "pools": 2120,
-   "total": 122.46396997840017,
-   "curve": 122.46396997840017,
+   "pools": 2198,
+   "total": 125.52643734160021,
+   "curve": 125.52643734160021,
+   "migration": 0.0,
+   "lp": 0.0
+  },
+  {
+   "fee_claimer": "CtNKS1hARwNwArgAGDjoF8xPHjapGj2qaHfY8LW2bfzn",
+   "pools": 3488,
+   "total": 122.44864301440013,
+   "curve": 122.44864301440013,
    "migration": 0.0,
    "lp": 0.0
   },
   {
    "fee_claimer": "6gTfwgPKHWxzYzKLjdrQXo9mcsa82RNdMG35XFwckn8N",
    "pools": 1,
-   "total": 118.30701844753831,
+   "total": 118.30735326853832,
    "curve": 97.516969888,
    "migration": 13.149350649299999,
-   "lp": 7.640697910238314
-  },
-  {
-   "fee_claimer": "CtNKS1hARwNwArgAGDjoF8xPHjapGj2qaHfY8LW2bfzn",
-   "pools": 3378,
-   "total": 117.3990365736001,
-   "curve": 117.3990365736001,
-   "migration": 0.0,
-   "lp": 0.0
+   "lp": 7.6410327312383135
   },
   {
    "fee_claimer": "6KUsPDpT5E4ki1TebDiAdb9kR7F5MSdPj7zmWgMxXWrb",
    "pools": 1,
-   "total": 111.258426205,
+   "total": 111.288430458,
    "curve": 7.269481524,
    "migration": 0.0,
-   "lp": 103.988944681
+   "lp": 104.018948934
   },
   {
    "fee_claimer": "4LbbPNg5VfVx57VktL4myijgWQnwQpo4tdv7v2f465sp",
-   "pools": 1622,
-   "total": 109.49691950880009,
-   "curve": 109.49691950880009,
+   "pools": 1623,
+   "total": 109.60220931520008,
+   "curve": 109.60220931520008,
    "migration": 0.0,
    "lp": 0.0
   }
