@@ -1,5 +1,5 @@
 {
- "updated_utc": "2026-11-02T08:54:02Z",
+ "updated_utc": "2026-11-02T09:54:02Z",
  "threshold_pct": 20,
  "curves": [
   {
@@ -7,7 +7,7 @@
    "base_mint": "2yo7E2ifPrg3Kauuz12JZv3DbRuZSwirZoRq5h78oJmG",
    "config": "CBtCqHjadQZHFVV3D74LhS55xkjDixBuk5nKUTWf4qeY",
    "quote_mint": "FUSE3in85PPWaA7BdRucpRyemH69nLQHdCU6NfwfWXqL",
-   "progress_pct": 76.694,
+   "progress_pct": 76.707,
    "graduation_take_pct": 20,
    "graduation_take_creator_pct": 0
   },
@@ -16,7 +16,7 @@
    "base_mint": "CKeTk8xbrM2U3qoXRD8i2TzfPGq6ftAWKwwYURq1UigW",
    "config": "BR9Pdn5GNqTiVuddwStUSSqD4pZrConyAKmUVUY3TUwE",
    "quote_mint": "FUSE3in85PPWaA7BdRucpRyemH69nLQHdCU6NfwfWXqL",
-   "progress_pct": 27.459,
+   "progress_pct": 27.497,
    "graduation_take_pct": 20,
    "graduation_take_creator_pct": 0
   },
@@ -30,22 +30,22 @@
    "graduation_take_creator_pct": 0
   },
   {
+   "pool": "CAfqxMHTZc4YHdApxgxbMbUpV6U8CTKo8uoixa92DcaS",
+   "base_mint": "6VJnmXSHkC7awLNqb684Metaxmj662noqH83CWCn8zih",
+   "config": "6GdLrNUhNWe2vqp3Hr75pcfMzzc65qruPjRoCERDeHAy",
+   "quote_mint": "So11111111111111111111111111111111111111112",
+   "progress_pct": 19.938,
+   "graduation_take_pct": 22,
+   "graduation_take_creator_pct": 90
+  },
+  {
    "pool": "8BkoidRaGgFhVKB7jFqb6A9xv64FzjteJfpke7rKdJqL",
    "base_mint": "Fgqw8RgRnegwHWZvtUAd3zjW2TQhosru5XRNrGpWRJDH",
    "config": "BkhaUo53ZMJRi9vtgnRtA6nXV6eBh1W2Ky2gtf9YyCBi",
    "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 9.088,
+   "progress_pct": 4.804,
    "graduation_take_pct": 50,
    "graduation_take_creator_pct": 0
-  },
-  {
-   "pool": "GsvJ6YfN16Krk44P3i888WMiVUmQ5RX2vgcWQL91vN3A",
-   "base_mint": "5xD4rmd4Vsw3j35qnC8yQmPbxJ9HSbeiF9VTqoqride",
-   "config": "4gg862r92UbSzMMo9oVVJ5JMkqrg841yAuRbpp2dj1UT",
-   "quote_mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-   "progress_pct": 7.812,
-   "graduation_take_pct": 25,
-   "graduation_take_creator_pct": 100
   },
   {
    "pool": "8djoXpStah73j9AQbZReFdXotHvRmWiDEj2C6oimWFT5",
