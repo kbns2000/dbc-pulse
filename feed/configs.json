@@ -1,18 +1,4 @@
 {
- "updated_utc": "2026-11-03T22:54:02Z",
- "configs": [
-  {
-   "config": "unknown",
-   "pools": 661,
-   "curve_complete": 0,
-   "migrated": 0,
-   "launches": 0,
-   "completion_rate": null,
-   "instant_share": null,
-   "median_minutes_to_complete": null,
-   "median_swaps": 0.0,
-   "graduation_take_pct": null,
-   "graduation_take_creator_pct": null
-  }
- ]
+ "updated_utc": "2026-11-03T23:54:02Z",
+ "configs": []
 }
