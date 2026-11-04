@@ -1,5 +1,5 @@
 {
- "updated_utc": "2026-11-04T11:54:02Z",
+ "updated_utc": "2026-11-04T12:54:02Z",
  "threshold_pct": 20,
  "curves": [
   {
@@ -35,6 +35,15 @@
    "config": "BR9Pdn5GNqTiVuddwStUSSqD4pZrConyAKmUVUY3TUwE",
    "quote_mint": "FUSE3in85PPWaA7BdRucpRyemH69nLQHdCU6NfwfWXqL",
    "progress_pct": 19.625,
+   "graduation_take_pct": 20,
+   "graduation_take_creator_pct": 0
+  },
+  {
+   "pool": "ECbTqkpNQ6uD2bWNSNJcsxX5PWEqkR6iKuePWt1J8Eug",
+   "base_mint": "Bs8GRcr1diFC9117aEzwVjvbK2xnKqLhiyouWgJcards",
+   "config": "teZtA79gucgVL9AfM2MeL6UtKA97B6CbipQQf2WCLDm",
+   "quote_mint": "So11111111111111111111111111111111111111112",
+   "progress_pct": 0.722,
    "graduation_take_pct": 20,
    "graduation_take_creator_pct": 0
   },
