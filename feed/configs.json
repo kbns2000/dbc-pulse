@@ -1,5 +1,5 @@
 {
- "updated_utc": "2026-11-06T01:39:59Z",
+ "updated_utc": "2026-11-06T01:54:02Z",
  "configs": [
   {
    "config": "2XyKhFogGgEQVFtyMce6UqkHMSvsa8ME3VEcXvYnm5Gz",
@@ -16,7 +16,7 @@
   },
   {
    "config": "unknown",
-   "pools": 19,
+   "pools": 20,
    "curve_complete": 0,
    "migrated": 0,
    "launches": 0,
@@ -29,7 +29,7 @@
   },
   {
    "config": "FbKf76ucsQssF7XZBuzScdJfugtsSKwZFYztKsMEhWZM",
-   "pools": 17,
+   "pools": 18,
    "curve_complete": 0,
    "migrated": 0,
    "launches": 0,
@@ -2433,7 +2433,7 @@
    "graduation_take_creator_pct": 0
   },
   {
-   "config": "CaDBnXEGdbJ9bKBN8U4AbbvJ7BMY6KMrBTXDyShaonjd",
+   "config": "H5knG16AugskeW4XkJFZ9Gob9NC5p6q98LNkVXfnzvoP",
    "pools": 1,
    "curve_complete": 0,
    "migrated": 0,
@@ -2446,7 +2446,124 @@
    "graduation_take_creator_pct": 0
   },
   {
-   "config": "H5knG16AugskeW4XkJFZ9Gob9NC5p6q98LNkVXfnzvoP",
+   "config": "zVyBdRT8ffF7BuoVz3TwEqirhAsXVfZpeh11nTP4Vxn",
+   "pools": 1,
+   "curve_complete": 0,
+   "migrated": 0,
+   "launches": null,
+   "completion_rate": null,
+   "instant_share": null,
+   "median_minutes_to_complete": null,
+   "median_swaps": null,
+   "graduation_take_pct": 0,
+   "graduation_take_creator_pct": 0
+  },
+  {
+   "config": "GHv9iAqj5mTiP3PDNotAU1yDsA4CT88YJYrP5x7k3rep",
+   "pools": 1,
+   "curve_complete": 0,
+   "migrated": 0,
+   "launches": null,
+   "completion_rate": null,
+   "instant_share": null,
+   "median_minutes_to_complete": null,
+   "median_swaps": null,
+   "graduation_take_pct": 0,
+   "graduation_take_creator_pct": 0
+  },
+  {
+   "config": "CbzHdASihRScrawXPREWQ83ain1bePKG1nkztAt32vea",
+   "pools": 1,
+   "curve_complete": 0,
+   "migrated": 0,
+   "launches": null,
+   "completion_rate": null,
+   "instant_share": null,
+   "median_minutes_to_complete": null,
+   "median_swaps": null,
+   "graduation_take_pct": 0,
+   "graduation_take_creator_pct": 0
+  },
+  {
+   "config": "BsKpBXVbVFhDtCREnXadjs7YMhYwiyyqZwcb6nsW8FcQ",
+   "pools": 1,
+   "curve_complete": 0,
+   "migrated": 0,
+   "launches": null,
+   "completion_rate": null,
+   "instant_share": null,
+   "median_minutes_to_complete": null,
+   "median_swaps": null,
+   "graduation_take_pct": 5,
+   "graduation_take_creator_pct": 0
+  },
+  {
+   "config": "DBYHyRzTgjpsfGLyMnE4nq6W4CcEd1oWpeGRjaq5BXkT",
+   "pools": 1,
+   "curve_complete": 0,
+   "migrated": 0,
+   "launches": null,
+   "completion_rate": null,
+   "instant_share": null,
+   "median_minutes_to_complete": null,
+   "median_swaps": null,
+   "graduation_take_pct": 3,
+   "graduation_take_creator_pct": 0
+  },
+  {
+   "config": "FLxyAtwcUikiBELF9Xx9VXfkTi9hM6C6uTByakgDb25r",
+   "pools": 1,
+   "curve_complete": 0,
+   "migrated": 0,
+   "launches": null,
+   "completion_rate": null,
+   "instant_share": null,
+   "median_minutes_to_complete": null,
+   "median_swaps": null,
+   "graduation_take_pct": 0,
+   "graduation_take_creator_pct": 0
+  },
+  {
+   "config": "6gMbFaAkwauZk7TcgQjtK3M9N39Xgt7Nm1pCRkdaUYf7",
+   "pools": 1,
+   "curve_complete": 0,
+   "migrated": 0,
+   "launches": null,
+   "completion_rate": null,
+   "instant_share": null,
+   "median_minutes_to_complete": null,
+   "median_swaps": null,
+   "graduation_take_pct": 1,
+   "graduation_take_creator_pct": 50
+  },
+  {
+   "config": "2aKBNrpW1JTmL2k27XqjT97TCfSWvM2pMTPsgjTSF9mg",
+   "pools": 1,
+   "curve_complete": 0,
+   "migrated": 0,
+   "launches": null,
+   "completion_rate": null,
+   "instant_share": null,
+   "median_minutes_to_complete": null,
+   "median_swaps": null,
+   "graduation_take_pct": 0,
+   "graduation_take_creator_pct": 0
+  },
+  {
+   "config": "4yk86fBzpfYRgoeMhq3m16RFXMAGHQwCZKBZEyvU7RHW",
+   "pools": 1,
+   "curve_complete": 0,
+   "migrated": 0,
+   "launches": null,
+   "completion_rate": null,
+   "instant_share": null,
+   "median_minutes_to_complete": null,
+   "median_swaps": null,
+   "graduation_take_pct": 0,
+   "graduation_take_creator_pct": 0
+  },
+  {
+   "config": "9kQmCs72mvdwqZ4PRqFyBtrUKZQuqrhESEQ6jARiWpgn",
    "pools": 1,
    "curve_complete": 0,
    "migrated": 0,
