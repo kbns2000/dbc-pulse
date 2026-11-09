@@ -1,5 +1,5 @@
 {
- "updated_utc": "2026-11-09T03:54:02Z",
+ "updated_utc": "2026-11-09T04:54:02Z",
  "threshold_pct": 20,
  "curves": [
   {
@@ -30,20 +30,11 @@
    "graduation_take_creator_pct": 90
   },
   {
-   "pool": "9k3jH5vyzMpgic1YAGBzfAbMpNzcLsHEzZ7gqKLsZfq1",
-   "base_mint": "6MFtxjdxXGanyRWEDSny6TksgxhoPRFDvQmWxSsizqz3",
-   "config": "64TnhRnhY4QRPw2ykx6xHZ4LS7vxu8zTEDSnM1yzHWQq",
-   "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 3.829,
-   "graduation_take_pct": 20,
-   "graduation_take_creator_pct": 0
-  },
-  {
    "pool": "2qDhS8YvsSpxGvkVQgEoo57D79osEKQ3KJ4not4kjM5C",
    "base_mint": "5toQu27mWnvThfParfuHV7jxxmdzPDNd174RwMnKWckg",
    "config": "8Ty59uH5TWS2P3eqkmS9mdJdjxtNp4dn5ijbNuyFBP7X",
    "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 2.971,
+   "progress_pct": 2.893,
    "graduation_take_pct": 99,
    "graduation_take_creator_pct": 0
   },
@@ -156,21 +147,21 @@
    "graduation_take_creator_pct": 0
   },
   {
+   "pool": "9k3jH5vyzMpgic1YAGBzfAbMpNzcLsHEzZ7gqKLsZfq1",
+   "base_mint": "6MFtxjdxXGanyRWEDSny6TksgxhoPRFDvQmWxSsizqz3",
+   "config": "64TnhRnhY4QRPw2ykx6xHZ4LS7vxu8zTEDSnM1yzHWQq",
+   "quote_mint": "So11111111111111111111111111111111111111112",
+   "progress_pct": 0.028,
+   "graduation_take_pct": 20,
+   "graduation_take_creator_pct": 0
+  },
+  {
    "pool": "8wtNzG18oF6oxZGZpBPjhy1DB1M2RYSnJ5XWrnonzYYF",
    "base_mint": "7ry4koFHaB3FaUnevkC1byWP7FLdZsDYphGEdhC3gZBr",
    "config": "ABfT52W2DLQv35VSUGCFavBgx9poZiddLADvPo5zUCKg",
    "quote_mint": "So11111111111111111111111111111111111111112",
    "progress_pct": 0.02,
    "graduation_take_pct": 50,
-   "graduation_take_creator_pct": 0
-  },
-  {
-   "pool": "2BR2nMjtPHe1ro6XY7mbN4wJUhcHCJ4RFmzDckUzUEB1",
-   "base_mint": "7gQ6NhYDjHrchhGV8eDEFtkGVw1NntJ39zvQTjbPPLEX",
-   "config": "CLSgY3bboBQSVeuabZ9RMdLCRbNh429JNJoQdA3TR5AA",
-   "quote_mint": "So11111111111111111111111111111111111111112",
-   "progress_pct": 0.012,
-   "graduation_take_pct": 20,
    "graduation_take_creator_pct": 0
   },
   {
