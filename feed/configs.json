@@ -1,9 +1,9 @@
 {
- "updated_utc": "2026-11-12T04:54:01Z",
+ "updated_utc": "2026-11-12T05:54:02Z",
  "configs": [
   {
    "config": "FbKf76ucsQssF7XZBuzScdJfugtsSKwZFYztKsMEhWZM",
-   "pools": 21,
+   "pools": 10,
    "curve_complete": 0,
    "migrated": 0,
    "launches": 0,
@@ -55,7 +55,7 @@
   },
   {
    "config": "unknown",
-   "pools": 5,
+   "pools": 4,
    "curve_complete": 0,
    "migrated": 0,
    "launches": 0,
@@ -67,33 +67,7 @@
    "graduation_take_creator_pct": null
   },
   {
-   "config": "6w9MBC4N5svAiuEoeCL4WDrpXR1xMbEkfA1tjJFEsDeP",
-   "pools": 5,
-   "curve_complete": 0,
-   "migrated": 0,
-   "launches": null,
-   "completion_rate": null,
-   "instant_share": null,
-   "median_minutes_to_complete": null,
-   "median_swaps": null,
-   "graduation_take_pct": 0,
-   "graduation_take_creator_pct": 0
-  },
-  {
    "config": "DNmnksLW9Dg1dC4VaMkWr1Q7UuUpg88RpatvGUYTocPR",
-   "pools": 4,
-   "curve_complete": 0,
-   "migrated": 0,
-   "launches": null,
-   "completion_rate": null,
-   "instant_share": null,
-   "median_minutes_to_complete": null,
-   "median_swaps": null,
-   "graduation_take_pct": 0,
-   "graduation_take_creator_pct": 0
-  },
-  {
-   "config": "AFsDdXtadPLy1B9obtbD4XDY1rrsffKgKAiN6unvfx2a",
    "pools": 3,
    "curve_complete": 0,
    "migrated": 0,
@@ -102,8 +76,21 @@
    "instant_share": null,
    "median_minutes_to_complete": null,
    "median_swaps": null,
-   "graduation_take_pct": 10,
-   "graduation_take_creator_pct": 50
+   "graduation_take_pct": 0,
+   "graduation_take_creator_pct": 0
+  },
+  {
+   "config": "6w9MBC4N5svAiuEoeCL4WDrpXR1xMbEkfA1tjJFEsDeP",
+   "pools": 3,
+   "curve_complete": 0,
+   "migrated": 0,
+   "launches": null,
+   "completion_rate": null,
+   "instant_share": null,
+   "median_minutes_to_complete": null,
+   "median_swaps": null,
+   "graduation_take_pct": 0,
+   "graduation_take_creator_pct": 0
   },
   {
    "config": "HH1jgNH8gbHU4dBaxWwBTh1gapPaH1tZGz6GMKtvSoSn",
@@ -158,7 +145,7 @@
    "graduation_take_creator_pct": 0
   },
   {
-   "config": "BNZ3RvTMFFHkbqVz6VCfQeiK32dWnVF2oqnEWRdX3LrU",
+   "config": "AFsDdXtadPLy1B9obtbD4XDY1rrsffKgKAiN6unvfx2a",
    "pools": 2,
    "curve_complete": 0,
    "migrated": 0,
@@ -167,8 +154,8 @@
    "instant_share": null,
    "median_minutes_to_complete": null,
    "median_swaps": null,
-   "graduation_take_pct": 0,
-   "graduation_take_creator_pct": 0
+   "graduation_take_pct": 10,
+   "graduation_take_creator_pct": 50
   },
   {
    "config": "2nz2axtAkFX9f1jtyHQ5wbiRWZgdApL4xmy2rYdNnXG3",
@@ -457,32 +444,6 @@
    "graduation_take_creator_pct": 0
   },
   {
-   "config": "9zLhbv27CqmxmmKNUZQHLCijG8vrgM4nbe3w79FJdCz8",
-   "pools": 1,
-   "curve_complete": 0,
-   "migrated": 0,
-   "launches": null,
-   "completion_rate": null,
-   "instant_share": null,
-   "median_minutes_to_complete": null,
-   "median_swaps": null,
-   "graduation_take_pct": 0,
-   "graduation_take_creator_pct": 0
-  },
-  {
-   "config": "2TBDGESNgDiLqVDy7AeAnqfYNQf87NnRVhvQ4ZsVdc9e",
-   "pools": 1,
-   "curve_complete": 0,
-   "migrated": 0,
-   "launches": null,
-   "completion_rate": null,
-   "instant_share": null,
-   "median_minutes_to_complete": null,
-   "median_swaps": null,
-   "graduation_take_pct": 0,
-   "graduation_take_creator_pct": 0
-  },
-  {
    "config": "BTjZrismepzPiNTjAr6Sgcow6UDt8Q8vgSL1X1D7Byq9",
    "pools": 1,
    "curve_complete": 0,
@@ -494,19 +455,6 @@
    "median_swaps": null,
    "graduation_take_pct": 10,
    "graduation_take_creator_pct": 50
-  },
-  {
-   "config": "FRHiDtq3omor4f1KPQJXS3ChjuAJtY6pbSKxj6nK2HB",
-   "pools": 1,
-   "curve_complete": 0,
-   "migrated": 0,
-   "launches": null,
-   "completion_rate": null,
-   "instant_share": null,
-   "median_minutes_to_complete": null,
-   "median_swaps": null,
-   "graduation_take_pct": 0,
-   "graduation_take_creator_pct": 0
   },
   {
    "config": "44hSQNdzGvGMx9kJ9YNafvvBHbyCvDKexwfrYkDXufEW",
@@ -574,33 +522,7 @@
    "graduation_take_creator_pct": 0
   },
   {
-   "config": "34LCykR49eLN4PDoW7zWzft8qEqrP4XD7rAFQNRDAxZP",
-   "pools": 1,
-   "curve_complete": 0,
-   "migrated": 0,
-   "launches": null,
-   "completion_rate": null,
-   "instant_share": null,
-   "median_minutes_to_complete": null,
-   "median_swaps": null,
-   "graduation_take_pct": 0,
-   "graduation_take_creator_pct": 0
-  },
-  {
    "config": "8e5QkwR5K3u7jTpYYibNqr2czJis8i9Dbuogie59Z832",
-   "pools": 1,
-   "curve_complete": 0,
-   "migrated": 0,
-   "launches": null,
-   "completion_rate": null,
-   "instant_share": null,
-   "median_minutes_to_complete": null,
-   "median_swaps": null,
-   "graduation_take_pct": 0,
-   "graduation_take_creator_pct": 0
-  },
-  {
-   "config": "4ZuxyDFZT51BQrgZQy5BVQyyVi9R2ynkeZ5YhPH15wfd",
    "pools": 1,
    "curve_complete": 0,
    "migrated": 0,
@@ -704,45 +626,6 @@
    "graduation_take_creator_pct": 0
   },
   {
-   "config": "5dYdcUDKqtp49A5jFjPtxzcyAfRP7Xj2gy9uTUTwYE5a",
-   "pools": 1,
-   "curve_complete": 0,
-   "migrated": 0,
-   "launches": null,
-   "completion_rate": null,
-   "instant_share": null,
-   "median_minutes_to_complete": null,
-   "median_swaps": null,
-   "graduation_take_pct": 0,
-   "graduation_take_creator_pct": 0
-  },
-  {
-   "config": "4iSiGXk2VKijNJuQmGSFL3SBPuubqgfZqcuEpW14wbni",
-   "pools": 1,
-   "curve_complete": 0,
-   "migrated": 0,
-   "launches": null,
-   "completion_rate": null,
-   "instant_share": null,
-   "median_minutes_to_complete": null,
-   "median_swaps": null,
-   "graduation_take_pct": 0,
-   "graduation_take_creator_pct": 0
-  },
-  {
-   "config": "B646J17uWbihX7GtAW3PJW7iNFFiHCTef2XfAWQBQgZW",
-   "pools": 1,
-   "curve_complete": 0,
-   "migrated": 0,
-   "launches": null,
-   "completion_rate": null,
-   "instant_share": null,
-   "median_minutes_to_complete": null,
-   "median_swaps": null,
-   "graduation_take_pct": 0,
-   "graduation_take_creator_pct": 0
-  },
-  {
    "config": "FsjWZPbMgW2Et3wnJj4SjnYZdbNDCpgv8Q4obLxSwS1K",
    "pools": 1,
    "curve_complete": 0,
@@ -834,19 +717,6 @@
    "graduation_take_creator_pct": 0
   },
   {
-   "config": "AxNk3tzPYXUgEoCTYQsBRQTdMSMsSKbbAtRVesP6WSnx",
-   "pools": 1,
-   "curve_complete": 0,
-   "migrated": 0,
-   "launches": null,
-   "completion_rate": null,
-   "instant_share": null,
-   "median_minutes_to_complete": null,
-   "median_swaps": null,
-   "graduation_take_pct": 0,
-   "graduation_take_creator_pct": 0
-  },
-  {
    "config": "9tT5pQee7ZnrNG5hxJWw81juhPvpCPmW6Ud1WbQgMgiG",
    "pools": 1,
    "curve_complete": 0,
@@ -861,19 +731,6 @@
   },
   {
    "config": "FkswDTdhwxc32jdwzG4tfWLVvActiMzs5iCNY7u3LfTR",
-   "pools": 1,
-   "curve_complete": 0,
-   "migrated": 0,
-   "launches": null,
-   "completion_rate": null,
-   "instant_share": null,
-   "median_minutes_to_complete": null,
-   "median_swaps": null,
-   "graduation_take_pct": 0,
-   "graduation_take_creator_pct": 0
-  },
-  {
-   "config": "5vhV7TVh7czAAztudnczQpwFvdZLMuq4uHv8j2xs6vb5",
    "pools": 1,
    "curve_complete": 0,
    "migrated": 0,
@@ -951,32 +808,6 @@
    "graduation_take_creator_pct": 0
   },
   {
-   "config": "84cJacbd3nNNzUbJM3scJY1y1szYm7UKoEAkAcvKvXhy",
-   "pools": 1,
-   "curve_complete": 0,
-   "migrated": 0,
-   "launches": null,
-   "completion_rate": null,
-   "instant_share": null,
-   "median_minutes_to_complete": null,
-   "median_swaps": null,
-   "graduation_take_pct": 0,
-   "graduation_take_creator_pct": 0
-  },
-  {
-   "config": "D8DabJkEFEASovnMupEGQEh5sVEv3mqNywgzRqFAMYnD",
-   "pools": 1,
-   "curve_complete": 0,
-   "migrated": 0,
-   "launches": null,
-   "completion_rate": null,
-   "instant_share": null,
-   "median_minutes_to_complete": null,
-   "median_swaps": null,
-   "graduation_take_pct": 0,
-   "graduation_take_creator_pct": 0
-  },
-  {
    "config": "BsKpBXVbVFhDtCREnXadjs7YMhYwiyyqZwcb6nsW8FcQ",
    "pools": 1,
    "curve_complete": 0,
@@ -987,32 +818,6 @@
    "median_minutes_to_complete": null,
    "median_swaps": null,
    "graduation_take_pct": 5,
-   "graduation_take_creator_pct": 0
-  },
-  {
-   "config": "7mJHt3S5UAmnstrhytoXmbp8jKKbDMhe27yS7srKb5QM",
-   "pools": 1,
-   "curve_complete": 0,
-   "migrated": 0,
-   "launches": null,
-   "completion_rate": null,
-   "instant_share": null,
-   "median_minutes_to_complete": null,
-   "median_swaps": null,
-   "graduation_take_pct": 0,
-   "graduation_take_creator_pct": 0
-  },
-  {
-   "config": "EetpKYPtBoNrsYgJoVNqYs92CBfRrgbQzUutB8JdH1Pv",
-   "pools": 1,
-   "curve_complete": 0,
-   "migrated": 0,
-   "launches": null,
-   "completion_rate": null,
-   "instant_share": null,
-   "median_minutes_to_complete": null,
-   "median_swaps": null,
-   "graduation_take_pct": 0,
    "graduation_take_creator_pct": 0
   },
   {
@@ -1029,46 +834,7 @@
    "graduation_take_creator_pct": 0
   },
   {
-   "config": "FBdwbkjNV2JyS4L8tpdv3AerQVdZEL8GdRbFxpYrQmfp",
-   "pools": 1,
-   "curve_complete": 0,
-   "migrated": 0,
-   "launches": null,
-   "completion_rate": null,
-   "instant_share": null,
-   "median_minutes_to_complete": null,
-   "median_swaps": null,
-   "graduation_take_pct": 0,
-   "graduation_take_creator_pct": 0
-  },
-  {
-   "config": "71QDpQu325z7RkRLtHv1Dwqz7uHFwiBnJDssoiG43Z75",
-   "pools": 1,
-   "curve_complete": 0,
-   "migrated": 0,
-   "launches": null,
-   "completion_rate": null,
-   "instant_share": null,
-   "median_minutes_to_complete": null,
-   "median_swaps": null,
-   "graduation_take_pct": 0,
-   "graduation_take_creator_pct": 0
-  },
-  {
    "config": "23zoej7LXDeBSfvTX6Y6UiGG7njGnZb7bLKYsCbobKpv",
-   "pools": 1,
-   "curve_complete": 0,
-   "migrated": 0,
-   "launches": null,
-   "completion_rate": null,
-   "instant_share": null,
-   "median_minutes_to_complete": null,
-   "median_swaps": null,
-   "graduation_take_pct": 0,
-   "graduation_take_creator_pct": 0
-  },
-  {
-   "config": "J53CWtk2pWB17C6T96d6dPCPjK8D6xLk6qKV9yhU4erd",
    "pools": 1,
    "curve_complete": 0,
    "migrated": 0,
