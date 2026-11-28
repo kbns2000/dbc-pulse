@@ -1,5 +1,5 @@
 {
- "updated_utc": "2026-11-28T00:54:02Z",
+ "updated_utc": "2026-11-28T01:34:13Z",
  "threshold_pct": 20,
  "curves": [
   {
@@ -12,11 +12,20 @@
    "graduation_take_creator_pct": 0
   },
   {
+   "pool": "GZ55Fk42vwxQ96TrPnePBGLQfj3QHAjJrWHG3Bgis4hx",
+   "base_mint": "38mM3bvgSBLE7Y4nu94BqYQK13mtfNDWpfE6uqNV5Sq1",
+   "config": "CcB8quQ6WHRRA9oLpYYT9uSRNFMof1d5QKPDCNJniDua",
+   "quote_mint": "So11111111111111111111111111111111111111112",
+   "progress_pct": 16.9,
+   "graduation_take_pct": 99,
+   "graduation_take_creator_pct": 100
+  },
+  {
    "pool": "HvMjPYQzsLjAi9QxBGrq8RgxzxJvKtBzyoBBvNr8ohJR",
    "base_mint": "Van73pTDGHevLHw7btWiBmzEeHiJnY3TsUGbmkZiTVL",
    "config": "99h9cDxeuDM9Bgvis56bbR9RGnqbLXjZ57dsq3Vew2XA",
    "quote_mint": "A7bdiYdS5GjqGFtxf17ppRHtDKPkkRqbKtR27dxvQXaS",
-   "progress_pct": 2.534,
+   "progress_pct": 1.412,
    "graduation_take_pct": 20,
    "graduation_take_creator_pct": 0
   },
@@ -39,18 +48,18 @@
    "graduation_take_creator_pct": 0
   },
   {
-   "pool": "8RtLR4GpqYzxoZnWHAH4KzxZnxVkH4642u8qxFh7vELM",
-   "base_mint": "4nJQUwcCUzBg9xn4ubfTH8e2B6XciXovrijCMv8sseed",
-   "config": "DBPY7vJeUojgVg2QyNUWU6AnMsrAYqyHNeSveRFpbdgS",
+   "pool": "AD3VKaq3vrNjeXYJkDAj6tbtmpTXXVnLMLokGUZdocPZ",
+   "base_mint": "AcUgUMyHB4vRRZyLovAkvy9u14yWzVUBtBAmeAvehcgr",
+   "config": "FaVs18SB39CWuCGmAqn7UrgtdddeFTmZBQxMfcHR7DSQ",
    "quote_mint": "So11111111111111111111111111111111111111112",
    "progress_pct": 0.0,
    "graduation_take_pct": 99,
    "graduation_take_creator_pct": 100
   },
   {
-   "pool": "AD3VKaq3vrNjeXYJkDAj6tbtmpTXXVnLMLokGUZdocPZ",
-   "base_mint": "AcUgUMyHB4vRRZyLovAkvy9u14yWzVUBtBAmeAvehcgr",
-   "config": "FaVs18SB39CWuCGmAqn7UrgtdddeFTmZBQxMfcHR7DSQ",
+   "pool": "EGdUd2i3wq8znu8pboA6mhcVmzs7kmKq3ZVzqmYTyjvK",
+   "base_mint": "GqZJMLLrXKufRvujTct53tzS47rgpyNrgjBgQEv81Tqw",
+   "config": "CcB8quQ6WHRRA9oLpYYT9uSRNFMof1d5QKPDCNJniDua",
    "quote_mint": "So11111111111111111111111111111111111111112",
    "progress_pct": 0.0,
    "graduation_take_pct": 99,
